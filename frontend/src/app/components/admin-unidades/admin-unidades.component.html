@@ -1,0 +1,333 @@
+<div class="flex flex-wrap items-center justify-between gap-3">
+  <div>
+    <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Unidades</h1>
+    <p class="mt-1 text-sm text-slate-500">Consulta y alta de unidades registradas.</p>
+  </div>
+  <button
+    type="button"
+    (click)="openUnidadModal()"
+    class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
+  >
+    Registrar unidad
+  </button>
+</div>
+
+<section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+  <div class="flex flex-wrap items-center gap-3">
+    <input
+      type="text"
+      [value]="unidadSearch()"
+      (input)="onUnidadSearchInput($event)"
+      (keydown.enter)="searchUnidades()"
+      placeholder="Buscar por ID, nombre, estado, uactip o IP..."
+      class="w-full flex-1 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-700 outline-none ring-0 transition focus:border-slate-400"
+    />
+    <button
+      type="button"
+      (click)="searchUnidades()"
+      class="rounded-lg border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+    >
+      Buscar
+    </button>
+  </div>
+
+  @if (unidadesError()) {
+    <p class="mt-4 rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-sm text-rose-700">{{ unidadesError() }}</p>
+  }
+
+  <div class="mt-5 overflow-x-auto">
+    <table class="min-w-full divide-y divide-slate-200 text-sm">
+      <thead>
+        <tr class="text-left text-xs font-semibold uppercase tracking-[0.08em] text-slate-500">
+          <th class="px-3 py-3">
+            <button type="button" (click)="sortUnidades('id_unidad')" class="hover:text-slate-800">
+              ID Unidad {{ sortLabel('id_unidad') }}
+            </button>
+          </th>
+          <th class="px-3 py-3">
+            <button type="button" (click)="sortUnidades('nombre_unidad')" class="hover:text-slate-800">
+              Nombre Unidad {{ sortLabel('nombre_unidad') }}
+            </button>
+          </th>
+          <th class="px-3 py-3">
+            <button type="button" (click)="sortUnidades('estado')" class="hover:text-slate-800">
+              Estado {{ sortLabel('estado') }}
+            </button>
+          </th>
+          <th class="px-3 py-3">
+            <button type="button" (click)="sortUnidades('uactip_unidad')" class="hover:text-slate-800">
+              Uactip Unidad {{ sortLabel('uactip_unidad') }}
+            </button>
+          </th>
+          <th class="px-3 py-3">
+            <button type="button" (click)="sortUnidades('ip_unidad')" class="hover:text-slate-800">
+              IP Unidad {{ sortLabel('ip_unidad') }}
+            </button>
+          </th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        @if (unidadesLoading()) {
+          <tr>
+            <td class="px-3 py-6 text-slate-500" colspan="5">Cargando unidades...</td>
+          </tr>
+        } @else if (unidades().length === 0) {
+          <tr>
+            <td class="px-3 py-6 text-slate-500" colspan="5">No hay unidades registradas para ese criterio.</td>
+          </tr>
+        } @else {
+          @for (group of groupedUnidades(); track group.estado) {
+            <tr class="bg-slate-50/70">
+              <td colspan="5" class="px-3 py-2 text-xs font-semibold uppercase tracking-[0.08em] text-slate-600">
+                Estado: {{ group.estado }} ({{ group.unidades.length }})
+              </td>
+            </tr>
+            @for (unidad of group.unidades; track unidad.id_unidad) {
+              <tr class="hover:bg-slate-50">
+                <td class="px-3 py-3 font-medium text-slate-800">{{ unidad.id_unidad }}</td>
+                <td class="px-3 py-3 text-slate-700">{{ unidad.nombre_unidad }}</td>
+                <td class="px-3 py-3 text-slate-700">{{ unidad.estado || '-' }}</td>
+                <td class="px-3 py-3 text-slate-600">{{ formatDateTime(unidad.uactip_unidad) }}</td>
+                <td class="px-3 py-3 text-slate-700">{{ unidad.ip_unidad || '-' }}</td>
+              </tr>
+            }
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <div class="mt-5 flex flex-wrap items-center justify-between gap-3">
+    <p class="text-sm text-slate-500">Total: {{ unidadTotal() }} unidades</p>
+    <div class="flex items-center gap-2">
+      <button
+        type="button"
+        (click)="goToUnidadPage(unidadPage() - 1)"
+        [disabled]="unidadPage() <= 1"
+        class="rounded-md border border-slate-200 px-3 py-1.5 text-sm text-slate-700 disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        Anterior
+      </button>
+
+      @for (page of unidadPages(); track page) {
+        <button
+          type="button"
+          (click)="goToUnidadPage(page)"
+          class="rounded-md px-3 py-1.5 text-sm"
+          [class.bg-slate-900]="page === unidadPage()"
+          [class.text-white]="page === unidadPage()"
+          [class.border]="page !== unidadPage()"
+          [class.border-slate-200]="page !== unidadPage()"
+          [class.text-slate-700]="page !== unidadPage()"
+        >
+          {{ page }}
+        </button>
+      }
+
+      <button
+        type="button"
+        (click)="goToUnidadPage(unidadPage() + 1)"
+        [disabled]="unidadPage() >= unidadLastPage()"
+        class="rounded-md border border-slate-200 px-3 py-1.5 text-sm text-slate-700 disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        Siguiente
+      </button>
+    </div>
+  </div>
+</section>
+
+@if (unidadModalOpen()) {
+  <div class="fixed inset-0 z-50 grid place-items-center bg-slate-900/50 p-4">
+    <div class="w-full max-w-xl rounded-2xl bg-white p-6 shadow-xl sm:p-7">
+      <div class="mb-5 flex items-center justify-between">
+        <h2 class="text-xl font-semibold text-slate-900">Registrar unidad</h2>
+        <button type="button" (click)="closeUnidadModal()" class="rounded-md px-2 py-1 text-slate-500 hover:bg-slate-100">✕</button>
+      </div>
+
+      <div class="grid gap-4 sm:grid-cols-2">
+        <div class="sm:col-span-2">
+          <label class="mb-1 block text-sm font-medium text-slate-700">Nombre unidad</label>
+          <input
+            type="text"
+            [value]="unidadForm().nombre_unidad"
+            (input)="onUnidadFormChange('nombre_unidad', $event)"
+            required
+            class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400"
+          />
+        </div>
+
+        <div>
+          <label class="mb-1 block text-sm font-medium text-slate-700">Estado</label>
+          <select
+            [value]="unidadForm().id_estado"
+            (change)="onUnidadFormChange('id_estado', $event)"
+            required
+            class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400"
+          >
+            <option value="">Selecciona un estado</option>
+            @for (estado of estados(); track estado.id_estado) {
+              <option [value]="estado.id_estado">{{ estado.nombre_estado }}</option>
+            }
+          </select>
+        </div>
+
+        <div>
+          <label class="mb-1 block text-sm font-medium text-slate-700">Ciudad</label>
+          <input
+            type="text"
+            [value]="unidadForm().ciudad"
+            (input)="onUnidadFormChange('ciudad', $event)"
+            required
+            class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400"
+          />
+        </div>
+
+        <div>
+          <label class="mb-1 block text-sm font-medium text-slate-700">Zona</label>
+          <select
+            [value]="unidadForm().id_zona"
+            (change)="onUnidadFormChange('id_zona', $event)"
+            required
+            class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400"
+          >
+            <option value="">Selecciona una zona</option>
+            @for (zona of zonas(); track zona.id_zona) {
+              <option [value]="zona.id_zona">{{ zona.nombre_zona }}</option>
+            }
+          </select>
+        </div>
+
+        <div>
+          <label class="mb-1 block text-sm font-medium text-slate-700">Region</label>
+          <select
+            [value]="unidadForm().id_region"
+            (change)="onUnidadFormChange('id_region', $event)"
+            required
+            class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400"
+          >
+            <option value="">Selecciona una region</option>
+            @for (region of regiones(); track region.id_region) {
+              <option [value]="region.id_region">{{ region.nombre_region }}</option>
+            }
+          </select>
+        </div>
+
+        <div>
+          <label class="mb-1 block text-sm font-medium text-slate-700">Fecha apertura</label>
+          <input
+            type="date"
+            [value]="unidadForm().fapertura_unidad"
+            (input)="onUnidadFormChange('fapertura_unidad', $event)"
+            required
+            class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400"
+          />
+        </div>
+
+        <div>
+          <label class="mb-1 block text-sm font-medium text-slate-700">Telefono unidad</label>
+          <input
+            type="text"
+            [value]="unidadForm().telefono_unidad"
+            (input)="onUnidadFormChange('telefono_unidad', $event)"
+            required
+            class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400"
+          />
+        </div>
+
+        <div>
+          <label class="mb-1 block text-sm font-medium text-slate-700">Tipo de unidad</label>
+          <select
+            [value]="unidadForm().id_tipounidad"
+            (change)="onUnidadFormChange('id_tipounidad', $event)"
+            required
+            class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400"
+          >
+            <option value="">Selecciona un tipo</option>
+            @for (tipo of tiposUnidad(); track tipo.id_tipounidad) {
+              <option [value]="tipo.id_tipounidad">{{ tipo.nombre_tipounidad }}</option>
+            }
+          </select>
+        </div>
+
+        <div>
+          <label class="mb-1 block text-sm font-medium text-slate-700">Status unidad</label>
+          <select
+            [value]="unidadForm().status_unidad"
+            (change)="onUnidadFormChange('status_unidad', $event)"
+            required
+            class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400"
+          >
+            <option value="1">Activo</option>
+            <option value="0">Inactivo</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="mb-1 block text-sm font-medium text-slate-700">Alcance pedido</label>
+          <input
+            type="number"
+            min="0"
+            [value]="unidadForm().alcancepedido_unidad"
+            (input)="onUnidadFormChange('alcancepedido_unidad', $event)"
+            required
+            class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400"
+          />
+        </div>
+
+        <div>
+          <label class="mb-1 block text-sm font-medium text-slate-700">Clave unidad</label>
+          <input
+            type="text"
+            [value]="unidadForm().clave_unidad"
+            (input)="onUnidadFormChange('clave_unidad', $event)"
+            required
+            class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400"
+          />
+        </div>
+
+        <div>
+          <label class="mb-1 block text-sm font-medium text-slate-700">IP unidad</label>
+          <input
+            type="text"
+            [value]="unidadForm().ip_unidad"
+            (input)="onUnidadFormChange('ip_unidad', $event)"
+            placeholder="Ej. 192.168.0.10"
+            class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400"
+          />
+        </div>
+
+        <div class="sm:col-span-2">
+          <label class="mb-1 block text-sm font-medium text-slate-700">Uactip unidad</label>
+          <input
+            type="datetime-local"
+            [value]="unidadForm().uactip_unidad"
+            (input)="onUnidadFormChange('uactip_unidad', $event)"
+            class="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-slate-400"
+          />
+        </div>
+      </div>
+
+      <div class="mt-6 flex items-center justify-end gap-3">
+        <button
+          type="button"
+          (click)="closeUnidadModal()"
+          class="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100"
+        >
+          Cancelar
+        </button>
+        <button
+          type="button"
+          (click)="registrarUnidad()"
+          [disabled]="unidadSaving()"
+          class="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+        >
+          @if (unidadSaving()) {
+            Guardando...
+          } @else {
+            Guardar unidad
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}

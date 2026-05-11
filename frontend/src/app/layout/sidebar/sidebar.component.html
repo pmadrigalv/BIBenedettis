@@ -1,0 +1,234 @@
+<aside class="hidden h-screen w-64 border-r border-slate-200/80 bg-white px-5 py-6 lg:fixed lg:inset-y-0 lg:left-0 lg:z-40 lg:flex lg:flex-col lg:overflow-hidden">
+  <div class="flex items-center gap-3">
+    <div class="grid h-9 w-9 place-items-center rounded-lg bg-slate-900 text-sm font-bold text-white">Z</div>
+    <div>
+      <p class="text-sm font-semibold">Zenith</p>
+      <p class="text-xs text-slate-500">Dashboard</p>
+    </div>
+  </div>
+
+  <div class="mt-10 min-h-0 flex-1 overflow-y-auto pr-1">
+    <nav class="space-y-1">
+      <p class="px-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">Overview</p>
+    <a
+      class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition"
+      [class.bg-slate-900]="currentSection === 'dashboard'"
+      [class.text-white]="currentSection === 'dashboard'"
+      [class.text-slate-600]="currentSection !== 'dashboard'"
+      [class.hover:bg-slate-100]="currentSection !== 'dashboard'"
+      href="#"
+      (click)="onOpenDashboard($event)"
+    >
+      Dashboard
+    </a>
+      <p class="px-3 pt-6 pb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">Gestion</p>
+    <button
+      type="button"
+      (click)="onToggleAdminMenu()"
+      class="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+    >
+      <span>Administracion</span>
+      <svg
+        class="h-4 w-4 text-slate-500 transition-transform duration-200"
+        [class.rotate-180]="adminMenuOpen"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+        aria-hidden="true"
+      >
+        <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.512a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+      </svg>
+    </button>
+
+      @if (adminMenuOpen) {
+        <div class="ml-2 space-y-1 border-l border-slate-200 pl-3">
+        <a
+          class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition"
+          [class.bg-slate-100]="currentSection === 'unidades'"
+          [class.font-medium]="currentSection === 'unidades'"
+          [class.text-slate-800]="currentSection === 'unidades'"
+          [class.text-slate-600]="currentSection !== 'unidades'"
+          [class.hover:bg-slate-100]="currentSection !== 'unidades'"
+          href="#"
+          (click)="onOpenUnidades($event)"
+        >
+          Unidades
+        </a>
+        <a
+          class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition"
+          [class.bg-slate-100]="currentSection === 'usuarios'"
+          [class.font-medium]="currentSection === 'usuarios'"
+          [class.text-slate-800]="currentSection === 'usuarios'"
+          [class.text-slate-600]="currentSection !== 'usuarios'"
+          [class.hover:bg-slate-100]="currentSection !== 'usuarios'"
+          href="#"
+          (click)="onOpenUsuarios($event)"
+        >
+          Usuarios
+        </a>
+        <a class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-600 transition hover:bg-slate-100" href="#">Empresas</a>
+        </div>
+      }
+
+      <p class="px-3 pt-6 pb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">KPIS</p>
+    <button
+      type="button"
+      (click)="onToggleKpisMenu()"
+      class="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+    >
+      <span>KPIS</span>
+      <svg
+        class="h-4 w-4 text-slate-500 transition-transform duration-200"
+        [class.rotate-180]="kpisMenuOpen"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+        aria-hidden="true"
+      >
+        <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.512a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+      </svg>
+    </button>
+
+      @if (kpisMenuOpen) {
+        <div class="ml-2 space-y-1 border-l border-slate-200 pl-3">
+        <a
+          class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition"
+          [class.bg-slate-100]="currentSection === 'kpis-vta-orilla'"
+          [class.font-medium]="currentSection === 'kpis-vta-orilla'"
+          [class.text-slate-800]="currentSection === 'kpis-vta-orilla'"
+          [class.text-slate-600]="currentSection !== 'kpis-vta-orilla'"
+          [class.hover:bg-slate-100]="currentSection !== 'kpis-vta-orilla'"
+          href="#"
+          (click)="onOpenKpiVtaOrilla($event)"
+        >
+          VTA ORILLA
+        </a>
+        <a
+          class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition"
+          [class.bg-slate-100]="currentSection === 'kpis-vta-pizzas'"
+          [class.font-medium]="currentSection === 'kpis-vta-pizzas'"
+          [class.text-slate-800]="currentSection === 'kpis-vta-pizzas'"
+          [class.text-slate-600]="currentSection !== 'kpis-vta-pizzas'"
+          [class.hover:bg-slate-100]="currentSection !== 'kpis-vta-pizzas'"
+          href="#"
+          (click)="onOpenKpiVtaPizzas($event)"
+        >
+          VTA PIZZAS
+        </a>
+        <a
+          class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition"
+          [class.bg-slate-100]="currentSection === 'kpis-vta-adicionales'"
+          [class.font-medium]="currentSection === 'kpis-vta-adicionales'"
+          [class.text-slate-800]="currentSection === 'kpis-vta-adicionales'"
+          [class.text-slate-600]="currentSection !== 'kpis-vta-adicionales'"
+          [class.hover:bg-slate-100]="currentSection !== 'kpis-vta-adicionales'"
+          href="#"
+          (click)="onOpenKpiVtaAdicionales($event)"
+        >
+          VTA ADICIONALES
+        </a>
+        <a
+          class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition"
+          [class.bg-slate-100]="currentSection === 'kpis-rpt-vtas'"
+          [class.font-medium]="currentSection === 'kpis-rpt-vtas'"
+          [class.text-slate-800]="currentSection === 'kpis-rpt-vtas'"
+          [class.text-slate-600]="currentSection !== 'kpis-rpt-vtas'"
+          [class.hover:bg-slate-100]="currentSection !== 'kpis-rpt-vtas'"
+          href="#"
+          (click)="onOpenKpiRptVtas($event)"
+        >
+          RPT VTAS
+        </a>
+        <a
+          class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition"
+          [class.bg-slate-100]="currentSection === 'kpis-rpt-malas-ordenes'"
+          [class.font-medium]="currentSection === 'kpis-rpt-malas-ordenes'"
+          [class.text-slate-800]="currentSection === 'kpis-rpt-malas-ordenes'"
+          [class.text-slate-600]="currentSection !== 'kpis-rpt-malas-ordenes'"
+          [class.hover:bg-slate-100]="currentSection !== 'kpis-rpt-malas-ordenes'"
+          href="#"
+          (click)="onOpenKpiRptMalasOrdenes($event)"
+        >
+          RPT MALAS ORDENES
+        </a>
+        </div>
+      }
+
+      <p class="px-3 pt-6 pb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">Sistemas</p>
+    <button
+      type="button"
+      (click)="onToggleSistemasMenu()"
+      class="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+    >
+      <span>Sistemas</span>
+      <svg
+        class="h-4 w-4 text-slate-500 transition-transform duration-200"
+        [class.rotate-180]="sistemasMenuOpen"
+        viewBox="0 0 20 20"
+        fill="currentColor"
+        aria-hidden="true"
+      >
+        <path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.512a.75.75 0 01-1.08 0L5.21 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" />
+      </svg>
+    </button>
+
+      @if (sistemasMenuOpen) {
+        <div class="ml-2 space-y-1 border-l border-slate-200 pl-3">
+        <a
+          class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition"
+          [class.bg-slate-100]="currentSection === 'tickets'"
+          [class.font-medium]="currentSection === 'tickets'"
+          [class.text-slate-800]="currentSection === 'tickets'"
+          [class.text-slate-600]="currentSection !== 'tickets'"
+          [class.hover:bg-slate-100]="currentSection !== 'tickets'"
+          href="#"
+          (click)="onOpenTickets($event)"
+        >
+          Tickets
+        </a>
+        <a
+          class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition"
+          [class.bg-slate-100]="currentSection === 'actualizaciones'"
+          [class.font-medium]="currentSection === 'actualizaciones'"
+          [class.text-slate-800]="currentSection === 'actualizaciones'"
+          [class.text-slate-600]="currentSection !== 'actualizaciones'"
+          [class.hover:bg-slate-100]="currentSection !== 'actualizaciones'"
+          href="#"
+          (click)="onOpenActualizaciones($event)"
+        >
+          Actualizaciones
+        </a>
+        </div>
+      }
+    </nav>
+  </div>
+
+  <div class="mt-auto space-y-3">
+    <button
+      type="button"
+      (click)="onLogout()"
+      class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+    >
+      Cerrar sesión ({{ authUserUid }})
+    </button>
+
+    <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+      <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Backend status</p>
+      <div class="mt-3 flex items-center gap-2">
+        <span
+          class="h-2.5 w-2.5 rounded-full"
+          [class.bg-emerald-500]="status === 'online'"
+          [class.bg-amber-400]="status === 'loading'"
+          [class.bg-rose-500]="status === 'offline'"
+        ></span>
+        <p class="text-sm font-medium text-slate-700">
+          @if (status === 'loading') {
+            Cargando
+          } @else if (status === 'online') {
+            En linea
+          } @else {
+            Sin conexion
+          }
+        </p>
+      </div>
+    </div>
+  </div>
+</aside>

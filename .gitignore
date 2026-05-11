@@ -1,0 +1,16 @@
+# Root env files
+.env
+.env.*
+!.env.example
+
+# System and editor files
+.DS_Store
+.vscode/.history/
+
+# Docker local data
+backend/database/mysql/
+backend/database/data/*.ibd
+backend/database/data/*.frm
+backend/database/data/*.MYD
+backend/database/data/*.MYI
+backend/database/data/*.pid

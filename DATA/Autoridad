@@ -1,0 +1,39 @@
+INSERT INTO vmxbe_root.autoridad (id_autoridad,msg_autoridad,descripcion_autoridad,tipo_autoridad) VALUES
+	 (1,'N','EVAC','U'),
+	 (2,'N','ERS','U'),
+	 (3,'N','PPP','U'),
+	 (4,'Y','ASA','U'),
+	 (5,'Y','AUREH','U'),
+	 (6,'Y','CI','U'),
+	 (7,'Y','Franquiciatario','U'),
+	 (8,'Y','Supervisor','U'),
+	 (9,'N','Franquiciatario','C'),
+	 (10,'Y','Sistemas','U');
+INSERT INTO vmxbe_root.autoridad (id_autoridad,msg_autoridad,descripcion_autoridad,tipo_autoridad) VALUES
+	 (17,'N','Almacen','C'),
+	 (18,'N','Admin. Comisariato','C'),
+	 (19,'N','Dir. Comisariato','C'),
+	 (40,'N','Asesor Regional MKT','C'),
+	 (41,'N','Asesor Nacional MKT','C'),
+	 (49,'N','Director MKT','C'),
+	 (50,'N','Asesor Regional','C'),
+	 (58,'N','Gerente Regional','C'),
+	 (64,'Y','Supervisor','C'),
+	 (65,'Y','Gerente regional','C');
+INSERT INTO vmxbe_root.autoridad (id_autoridad,msg_autoridad,descripcion_autoridad,tipo_autoridad) VALUES
+	 (67,'Y','Auditoría Operativa','C'),
+	 (68,'N','Planeación y Control','C'),
+	 (70,'N','Socio','C'),
+	 (80,'N','Asist. de Dirección','C'),
+	 (84,'N','Director de MKT','C'),
+	 (85,'Y','Director de sistemas','C'),
+	 (86,'N','Director Operaciones','C'),
+	 (87,'N','Director Adjunto','C'),
+	 (88,'N','Director General','C'),
+	 (89,'N','Presidente','C');
+INSERT INTO vmxbe_root.autoridad (id_autoridad,msg_autoridad,descripcion_autoridad,tipo_autoridad) VALUES
+	 (94,'Y','Asesor de Sistemas','C'),
+	 (95,'N','Soporte Técnico','C'),
+	 (96,'N','Gerente Regional','C'),
+	 (98,'Y','Desarrollo','C'),
+	 (99,'N','root','C');

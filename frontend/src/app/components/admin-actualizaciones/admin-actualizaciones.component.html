@@ -1,0 +1,178 @@
+<div class="space-y-5">
+  <!-- Header -->
+  <div class="flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Actualizaciones</h1>
+      <p class="mt-0.5 text-sm text-slate-500">{{ total() }} actualización{{ total() !== 1 ? 'es' : '' }} registradas</p>
+    </div>
+    <button
+      (click)="openModal()"
+      class="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700"
+    >
+      + Nueva actualización
+    </button>
+  </div>
+
+  <!-- Search -->
+  <div class="flex gap-2">
+    <input
+      type="text"
+      placeholder="Buscar actualizaciones..."
+      [value]="search()"
+      (input)="onSearchInput($event)"
+      (keyup.enter)="doSearch()"
+      class="w-full max-w-xs rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm text-slate-700 shadow-sm outline-none focus:ring-2 focus:ring-slate-300"
+    />
+    <button
+      (click)="doSearch()"
+      class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-600 shadow-sm transition hover:bg-slate-50"
+    >
+      Buscar
+    </button>
+  </div>
+
+  <!-- Error -->
+  @if (error()) {
+    <p class="text-sm text-rose-500">{{ error() }}</p>
+  }
+
+  <!-- Table -->
+  <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <table class="w-full text-sm">
+      <thead class="border-b border-slate-200 bg-slate-50 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">
+        <tr>
+          <th class="cursor-pointer px-5 py-3 hover:text-slate-800" (click)="sortBy_('id')">
+            # {{ sortLabel('id') }}
+          </th>
+          <th class="cursor-pointer px-5 py-3 hover:text-slate-800" (click)="sortBy_('titulo')">
+            Título {{ sortLabel('titulo') }}
+          </th>
+          <th class="cursor-pointer px-5 py-3 hover:text-slate-800" (click)="sortBy_('version')">
+            Versión {{ sortLabel('version') }}
+          </th>
+          <th class="cursor-pointer px-5 py-3 hover:text-slate-800" (click)="sortBy_('fecha_publicacion')">
+            Fecha publicación {{ sortLabel('fecha_publicacion') }}
+          </th>
+          <th class="cursor-pointer px-5 py-3 hover:text-slate-800" (click)="sortBy_('created_at')">
+            Creado {{ sortLabel('created_at') }}
+          </th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        @if (loading()) {
+          <tr>
+            <td colspan="5" class="px-5 py-8 text-center text-slate-400">Cargando...</td>
+          </tr>
+        } @else if (actualizaciones().length === 0) {
+          <tr>
+            <td colspan="5" class="px-5 py-8 text-center text-slate-400">Sin resultados.</td>
+          </tr>
+        } @else {
+          @for (a of actualizaciones(); track a.id) {
+            <tr class="transition hover:bg-slate-50">
+              <td class="px-5 py-3 font-mono text-xs text-slate-400">{{ a.id }}</td>
+              <td class="px-5 py-3 font-medium text-slate-800">{{ a.titulo }}</td>
+              <td class="px-5 py-3 text-slate-600">{{ a.version ?? '—' }}</td>
+              <td class="px-5 py-3 text-slate-600">{{ a.fecha_publicacion ?? '—' }}</td>
+              <td class="px-5 py-3 text-slate-500">{{ a.created_at | slice:0:10 }}</td>
+            </tr>
+          }
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  @if (lastPage() > 1) {
+    <div class="flex items-center justify-between text-sm text-slate-500">
+      <span>Página {{ page() }} de {{ lastPage() }}</span>
+      <div class="flex gap-1">
+        <button
+          (click)="goToPage(page() - 1)"
+          [disabled]="page() === 1"
+          class="rounded-lg border border-slate-200 px-3 py-1.5 transition hover:bg-slate-100 disabled:opacity-40"
+        >
+          ‹
+        </button>
+        <button
+          (click)="goToPage(page() + 1)"
+          [disabled]="page() === lastPage()"
+          class="rounded-lg border border-slate-200 px-3 py-1.5 transition hover:bg-slate-100 disabled:opacity-40"
+        >
+          ›
+        </button>
+      </div>
+    </div>
+  }
+</div>
+
+<!-- Modal -->
+@if (modalOpen()) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+    <div class="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+      <h2 class="text-lg font-semibold text-slate-900">Nueva actualización</h2>
+
+      <div class="mt-5 space-y-4">
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500">Título *</label>
+          <input
+            type="text"
+            [value]="form().titulo"
+            (input)="updateForm('titulo', $event)"
+            required
+            class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-slate-300"
+          />
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500">Descripción</label>
+          <textarea
+            [value]="form().descripcion"
+            (input)="updateForm('descripcion', $event)"
+            rows="3"
+            class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-slate-300"
+          ></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500">Versión</label>
+            <input
+              type="text"
+              [value]="form().version"
+              (input)="updateForm('version', $event)"
+              placeholder="ej. 1.0.0"
+              class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-slate-300"
+            />
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500">Fecha publicación</label>
+            <input
+              type="date"
+              [value]="form().fecha_publicacion"
+              (input)="updateForm('fecha_publicacion', $event)"
+              class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-slate-300"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6 flex justify-end gap-3">
+        <button
+          (click)="closeModal()"
+          class="rounded-xl border border-slate-200 px-4 py-2 text-sm text-slate-600 transition hover:bg-slate-50"
+        >
+          Cancelar
+        </button>
+        <button
+          (click)="saveActualizacion()"
+          [disabled]="saving() || !form().titulo.trim()"
+          class="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700 disabled:opacity-50"
+        >
+          {{ saving() ? 'Guardando...' : 'Guardar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
