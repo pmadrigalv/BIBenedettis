@@ -41,6 +41,7 @@ export class App {
   protected readonly loginSubmitting = signal(false);
   protected readonly loginUid = signal('');
   protected readonly loginPwd = signal('');
+  protected readonly sidebarOpen = signal(false);
   protected readonly adminMenuOpen = signal(false);
   protected readonly sistemasMenuOpen = signal(false);
   protected readonly kpisMenuOpen = signal(false);
@@ -109,7 +110,16 @@ export class App {
       this.currentSection.set('dashboard');
       this.health.set(null);
       this.status.set('loading');
+      this.sidebarOpen.set(false);
     });
+  }
+
+  protected toggleSidebar(): void {
+    this.sidebarOpen.update((value) => !value);
+  }
+
+  protected closeSidebar(): void {
+    this.sidebarOpen.set(false);
   }
 
   protected reload(): void {
@@ -135,56 +145,66 @@ export class App {
   protected openDashboard(event?: Event): void {
     event?.preventDefault();
     this.currentSection.set('dashboard');
+    this.closeSidebar();
   }
 
   protected openUnidades(event?: Event): void {
     event?.preventDefault();
     this.currentSection.set('unidades');
+    this.closeSidebar();
   }
 
   protected openUsuarios(event?: Event): void {
     event?.preventDefault();
     this.currentSection.set('usuarios');
+    this.closeSidebar();
   }
 
   protected openTickets(event?: Event): void {
     event?.preventDefault();
     this.currentSection.set('tickets');
+    this.closeSidebar();
   }
 
   protected openActualizaciones(event?: Event): void {
     event?.preventDefault();
     this.currentSection.set('actualizaciones');
+    this.closeSidebar();
   }
 
   protected openKpiVtaOrilla(event?: Event): void {
     event?.preventDefault();
     this.currentKpiReport.set('vta-orilla');
     this.currentSection.set('kpis-vta-orilla');
+    this.closeSidebar();
   }
 
   protected openKpiVtaPizzas(event?: Event): void {
     event?.preventDefault();
     this.currentKpiReport.set('vta-pizzas');
     this.currentSection.set('kpis-vta-pizzas');
+    this.closeSidebar();
   }
 
   protected openKpiVtaAdicionales(event?: Event): void {
     event?.preventDefault();
     this.currentKpiReport.set('vta-adicionales');
     this.currentSection.set('kpis-vta-adicionales');
+    this.closeSidebar();
   }
 
   protected openKpiRptVtas(event?: Event): void {
     event?.preventDefault();
     this.currentKpiReport.set('rpt-vtas');
     this.currentSection.set('kpis-rpt-vtas');
+    this.closeSidebar();
   }
 
   protected openKpiRptMalasOrdenes(event?: Event): void {
     event?.preventDefault();
     this.currentKpiReport.set('rpt-malas-ordenes');
     this.currentSection.set('kpis-rpt-malas-ordenes');
+    this.closeSidebar();
   }
 
   private loadHealth(): void {

@@ -1,35 +1,48 @@
-<aside class="hidden h-screen w-64 border-r border-slate-200/80 bg-white px-5 py-6 lg:fixed lg:inset-y-0 lg:left-0 lg:z-40 lg:flex lg:flex-col lg:overflow-hidden">
+<aside
+  class="fixed inset-y-0 left-0 z-40 flex h-screen w-72 flex-col overflow-hidden border-r border-emerald-900/40 bg-[#0b7f3f] px-5 py-6 text-white shadow-2xl transition-transform duration-300"
+  [class.-translate-x-full]="!isOpen"
+>
+  <div class="mb-4 flex justify-end">
+    <button
+      type="button"
+      (click)="onClose()"
+      class="rounded-lg border border-white/40 bg-white/10 px-2.5 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-white hover:bg-white/20"
+    >
+      Cerrar
+    </button>
+  </div>
+
   <div class="flex items-center gap-3">
-    <div class="grid h-9 w-9 place-items-center rounded-lg bg-slate-900 text-sm font-bold text-white">Z</div>
-    <div>
-      <p class="text-sm font-semibold">Zenith</p>
-      <p class="text-xs text-slate-500">Dashboard</p>
+    <div class="h-11 w-11 rounded-xl border-2 border-white/70 bg-[linear-gradient(135deg,#0f9b58_0%,#0f9b58_46%,#ffffff_46%,#ffffff_54%,#d73535_54%,#d73535_100%)]"></div>
+    <div class="leading-tight">
+      <p class="text-[2rem] font-extrabold italic tracking-tight text-white">Benedetti's <span class="ml-1 text-xl not-italic font-semibold tracking-[0.22em] text-[#ffda6f]">PIZZA</span></p>
+      <p class="text-[11px] uppercase tracking-[0.2em] text-emerald-100/80">Business Intelligence</p>
     </div>
   </div>
 
-  <div class="mt-10 min-h-0 flex-1 overflow-y-auto pr-1">
+  <div class="mt-6 min-h-0 flex-1 overflow-y-auto pr-1">
     <nav class="space-y-1">
-      <p class="px-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">Overview</p>
+      <p class="px-3 pb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-100/80">Overview</p>
     <a
       class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition"
-      [class.bg-slate-900]="currentSection === 'dashboard'"
-      [class.text-white]="currentSection === 'dashboard'"
-      [class.text-slate-600]="currentSection !== 'dashboard'"
-      [class.hover:bg-slate-100]="currentSection !== 'dashboard'"
+      [class.bg-white]="currentSection === 'dashboard'"
+      [class.text-emerald-900]="currentSection === 'dashboard'"
+      [class.text-white]="currentSection !== 'dashboard'"
+      [class.hover:bg-white/15]="currentSection !== 'dashboard'"
       href="#"
       (click)="onOpenDashboard($event)"
     >
       Dashboard
     </a>
-      <p class="px-3 pt-6 pb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">Gestion</p>
+      <p class="px-3 pt-6 pb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-100/80">Gestion</p>
     <button
       type="button"
       (click)="onToggleAdminMenu()"
-      class="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+      class="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm font-medium text-white transition hover:bg-white/15"
     >
       <span>Administracion</span>
       <svg
-        class="h-4 w-4 text-slate-500 transition-transform duration-200"
+        class="h-4 w-4 text-emerald-100 transition-transform duration-200"
         [class.rotate-180]="adminMenuOpen"
         viewBox="0 0 20 20"
         fill="currentColor"
@@ -40,14 +53,14 @@
     </button>
 
       @if (adminMenuOpen) {
-        <div class="ml-2 space-y-1 border-l border-slate-200 pl-3">
+        <div class="ml-2 space-y-1 border-l border-emerald-200/40 pl-3">
         <a
           class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition"
-          [class.bg-slate-100]="currentSection === 'unidades'"
+          [class.bg-white/90]="currentSection === 'unidades'"
           [class.font-medium]="currentSection === 'unidades'"
-          [class.text-slate-800]="currentSection === 'unidades'"
-          [class.text-slate-600]="currentSection !== 'unidades'"
-          [class.hover:bg-slate-100]="currentSection !== 'unidades'"
+          [class.text-emerald-900]="currentSection === 'unidades'"
+          [class.text-white]="currentSection !== 'unidades'"
+          [class.hover:bg-white/15]="currentSection !== 'unidades'"
           href="#"
           (click)="onOpenUnidades($event)"
         >
@@ -55,29 +68,29 @@
         </a>
         <a
           class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition"
-          [class.bg-slate-100]="currentSection === 'usuarios'"
+          [class.bg-white/90]="currentSection === 'usuarios'"
           [class.font-medium]="currentSection === 'usuarios'"
-          [class.text-slate-800]="currentSection === 'usuarios'"
-          [class.text-slate-600]="currentSection !== 'usuarios'"
-          [class.hover:bg-slate-100]="currentSection !== 'usuarios'"
+          [class.text-emerald-900]="currentSection === 'usuarios'"
+          [class.text-white]="currentSection !== 'usuarios'"
+          [class.hover:bg-white/15]="currentSection !== 'usuarios'"
           href="#"
           (click)="onOpenUsuarios($event)"
         >
           Usuarios
         </a>
-        <a class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-slate-600 transition hover:bg-slate-100" href="#">Empresas</a>
+        <a class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm text-white transition hover:bg-white/15" href="#">Empresas</a>
         </div>
       }
 
-      <p class="px-3 pt-6 pb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">KPIS</p>
+      <p class="px-3 pt-6 pb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-100/80">KPIS</p>
     <button
       type="button"
       (click)="onToggleKpisMenu()"
-      class="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+      class="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm font-medium text-white transition hover:bg-white/15"
     >
       <span>KPIS</span>
       <svg
-        class="h-4 w-4 text-slate-500 transition-transform duration-200"
+        class="h-4 w-4 text-emerald-100 transition-transform duration-200"
         [class.rotate-180]="kpisMenuOpen"
         viewBox="0 0 20 20"
         fill="currentColor"
@@ -88,14 +101,14 @@
     </button>
 
       @if (kpisMenuOpen) {
-        <div class="ml-2 space-y-1 border-l border-slate-200 pl-3">
+        <div class="ml-2 space-y-1 border-l border-emerald-200/40 pl-3">
         <a
           class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition"
-          [class.bg-slate-100]="currentSection === 'kpis-vta-orilla'"
+          [class.bg-white/90]="currentSection === 'kpis-vta-orilla'"
           [class.font-medium]="currentSection === 'kpis-vta-orilla'"
-          [class.text-slate-800]="currentSection === 'kpis-vta-orilla'"
-          [class.text-slate-600]="currentSection !== 'kpis-vta-orilla'"
-          [class.hover:bg-slate-100]="currentSection !== 'kpis-vta-orilla'"
+          [class.text-emerald-900]="currentSection === 'kpis-vta-orilla'"
+          [class.text-white]="currentSection !== 'kpis-vta-orilla'"
+          [class.hover:bg-white/15]="currentSection !== 'kpis-vta-orilla'"
           href="#"
           (click)="onOpenKpiVtaOrilla($event)"
         >
@@ -103,11 +116,11 @@
         </a>
         <a
           class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition"
-          [class.bg-slate-100]="currentSection === 'kpis-vta-pizzas'"
+          [class.bg-white/90]="currentSection === 'kpis-vta-pizzas'"
           [class.font-medium]="currentSection === 'kpis-vta-pizzas'"
-          [class.text-slate-800]="currentSection === 'kpis-vta-pizzas'"
-          [class.text-slate-600]="currentSection !== 'kpis-vta-pizzas'"
-          [class.hover:bg-slate-100]="currentSection !== 'kpis-vta-pizzas'"
+          [class.text-emerald-900]="currentSection === 'kpis-vta-pizzas'"
+          [class.text-white]="currentSection !== 'kpis-vta-pizzas'"
+          [class.hover:bg-white/15]="currentSection !== 'kpis-vta-pizzas'"
           href="#"
           (click)="onOpenKpiVtaPizzas($event)"
         >
@@ -115,11 +128,11 @@
         </a>
         <a
           class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition"
-          [class.bg-slate-100]="currentSection === 'kpis-vta-adicionales'"
+          [class.bg-white/90]="currentSection === 'kpis-vta-adicionales'"
           [class.font-medium]="currentSection === 'kpis-vta-adicionales'"
-          [class.text-slate-800]="currentSection === 'kpis-vta-adicionales'"
-          [class.text-slate-600]="currentSection !== 'kpis-vta-adicionales'"
-          [class.hover:bg-slate-100]="currentSection !== 'kpis-vta-adicionales'"
+          [class.text-emerald-900]="currentSection === 'kpis-vta-adicionales'"
+          [class.text-white]="currentSection !== 'kpis-vta-adicionales'"
+          [class.hover:bg-white/15]="currentSection !== 'kpis-vta-adicionales'"
           href="#"
           (click)="onOpenKpiVtaAdicionales($event)"
         >
@@ -127,11 +140,11 @@
         </a>
         <a
           class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition"
-          [class.bg-slate-100]="currentSection === 'kpis-rpt-vtas'"
+          [class.bg-white/90]="currentSection === 'kpis-rpt-vtas'"
           [class.font-medium]="currentSection === 'kpis-rpt-vtas'"
-          [class.text-slate-800]="currentSection === 'kpis-rpt-vtas'"
-          [class.text-slate-600]="currentSection !== 'kpis-rpt-vtas'"
-          [class.hover:bg-slate-100]="currentSection !== 'kpis-rpt-vtas'"
+          [class.text-emerald-900]="currentSection === 'kpis-rpt-vtas'"
+          [class.text-white]="currentSection !== 'kpis-rpt-vtas'"
+          [class.hover:bg-white/15]="currentSection !== 'kpis-rpt-vtas'"
           href="#"
           (click)="onOpenKpiRptVtas($event)"
         >
@@ -139,11 +152,11 @@
         </a>
         <a
           class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition"
-          [class.bg-slate-100]="currentSection === 'kpis-rpt-malas-ordenes'"
+          [class.bg-white/90]="currentSection === 'kpis-rpt-malas-ordenes'"
           [class.font-medium]="currentSection === 'kpis-rpt-malas-ordenes'"
-          [class.text-slate-800]="currentSection === 'kpis-rpt-malas-ordenes'"
-          [class.text-slate-600]="currentSection !== 'kpis-rpt-malas-ordenes'"
-          [class.hover:bg-slate-100]="currentSection !== 'kpis-rpt-malas-ordenes'"
+          [class.text-emerald-900]="currentSection === 'kpis-rpt-malas-ordenes'"
+          [class.text-white]="currentSection !== 'kpis-rpt-malas-ordenes'"
+          [class.hover:bg-white/15]="currentSection !== 'kpis-rpt-malas-ordenes'"
           href="#"
           (click)="onOpenKpiRptMalasOrdenes($event)"
         >
@@ -152,15 +165,15 @@
         </div>
       }
 
-      <p class="px-3 pt-6 pb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">Sistemas</p>
+      <p class="px-3 pt-6 pb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-emerald-100/80">Sistemas</p>
     <button
       type="button"
       (click)="onToggleSistemasMenu()"
-      class="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+      class="flex w-full items-center justify-between rounded-xl px-3 py-2.5 text-left text-sm font-medium text-white transition hover:bg-white/15"
     >
       <span>Sistemas</span>
       <svg
-        class="h-4 w-4 text-slate-500 transition-transform duration-200"
+        class="h-4 w-4 text-emerald-100 transition-transform duration-200"
         [class.rotate-180]="sistemasMenuOpen"
         viewBox="0 0 20 20"
         fill="currentColor"
@@ -171,14 +184,14 @@
     </button>
 
       @if (sistemasMenuOpen) {
-        <div class="ml-2 space-y-1 border-l border-slate-200 pl-3">
+        <div class="ml-2 space-y-1 border-l border-emerald-200/40 pl-3">
         <a
           class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition"
-          [class.bg-slate-100]="currentSection === 'tickets'"
+          [class.bg-white/90]="currentSection === 'tickets'"
           [class.font-medium]="currentSection === 'tickets'"
-          [class.text-slate-800]="currentSection === 'tickets'"
-          [class.text-slate-600]="currentSection !== 'tickets'"
-          [class.hover:bg-slate-100]="currentSection !== 'tickets'"
+          [class.text-emerald-900]="currentSection === 'tickets'"
+          [class.text-white]="currentSection !== 'tickets'"
+          [class.hover:bg-white/15]="currentSection !== 'tickets'"
           href="#"
           (click)="onOpenTickets($event)"
         >
@@ -186,11 +199,11 @@
         </a>
         <a
           class="flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition"
-          [class.bg-slate-100]="currentSection === 'actualizaciones'"
+          [class.bg-white/90]="currentSection === 'actualizaciones'"
           [class.font-medium]="currentSection === 'actualizaciones'"
-          [class.text-slate-800]="currentSection === 'actualizaciones'"
-          [class.text-slate-600]="currentSection !== 'actualizaciones'"
-          [class.hover:bg-slate-100]="currentSection !== 'actualizaciones'"
+          [class.text-emerald-900]="currentSection === 'actualizaciones'"
+          [class.text-white]="currentSection !== 'actualizaciones'"
+          [class.hover:bg-white/15]="currentSection !== 'actualizaciones'"
           href="#"
           (click)="onOpenActualizaciones($event)"
         >
@@ -205,13 +218,13 @@
     <button
       type="button"
       (click)="onLogout()"
-      class="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+      class="w-full rounded-xl border border-white/45 bg-white px-3 py-2 text-sm font-semibold text-emerald-900 transition hover:bg-emerald-50"
     >
       Cerrar sesión ({{ authUserUid }})
     </button>
 
-    <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-      <p class="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">Backend status</p>
+    <div class="rounded-2xl border border-emerald-200/45 bg-white/10 p-4 backdrop-blur-sm">
+      <p class="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-100/85">Backend status</p>
       <div class="mt-3 flex items-center gap-2">
         <span
           class="h-2.5 w-2.5 rounded-full"
@@ -219,7 +232,7 @@
           [class.bg-amber-400]="status === 'loading'"
           [class.bg-rose-500]="status === 'offline'"
         ></span>
-        <p class="text-sm font-medium text-slate-700">
+        <p class="text-sm font-medium text-white">
           @if (status === 'loading') {
             Cargando
           } @else if (status === 'online') {

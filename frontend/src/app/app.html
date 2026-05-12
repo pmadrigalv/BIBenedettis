@@ -49,13 +49,24 @@
     </div>
   } @else {
     <div class="mx-auto flex min-h-screen w-full max-w-[1500px]">
+      @if (sidebarOpen()) {
+        <button
+          type="button"
+          (click)="closeSidebar()"
+          class="fixed inset-0 z-30 bg-black/45 lg:bg-black/35"
+          aria-label="Cerrar menu lateral"
+        ></button>
+      }
+
       <app-sidebar
+        [isOpen]="sidebarOpen()"
         [currentSection]="currentSection()"
         [adminMenuOpen]="adminMenuOpen()"
         [sistemasMenuOpen]="sistemasMenuOpen()"
         [kpisMenuOpen]="kpisMenuOpen()"
         [status]="status()"
         [authUserUid]="authUser()?.uid_usuario || ''"
+        (close)="closeSidebar()"
         (toggleAdminMenu)="toggleAdminMenu()"
         (toggleSistemasMenu)="toggleSistemasMenu()"
         (toggleKpisMenu)="toggleKpisMenu()"
@@ -72,8 +83,8 @@
         (logout)="logout()"
       />
 
-      <section class="flex min-w-0 flex-1 flex-col lg:pl-64">
-        <app-navbar />
+      <section class="flex min-w-0 flex-1 flex-col">
+        <app-navbar (toggleSidebar)="toggleSidebar()" />
 
         <div class="flex-1 space-y-6 px-4 py-6 sm:px-7 lg:px-8">
           @if (currentSection() === 'unidades') {

@@ -19,6 +19,7 @@ export type BackendStatus = 'loading' | 'online' | 'offline';
   templateUrl: './sidebar.component.html',
 })
 export class SidebarComponent {
+  @Input() isOpen = false;
   @Input() currentSection: LayoutSection = 'dashboard';
   @Input() adminMenuOpen = false;
   @Input() sistemasMenuOpen = false;
@@ -40,6 +41,11 @@ export class SidebarComponent {
   @Output() openKpiRptVtas = new EventEmitter<void>();
   @Output() openKpiRptMalasOrdenes = new EventEmitter<void>();
   @Output() logout = new EventEmitter<void>();
+  @Output() close = new EventEmitter<void>();
+
+  protected onClose(): void {
+    this.close.emit();
+  }
 
   protected onToggleAdminMenu(): void {
     this.toggleAdminMenu.emit();
