@@ -5,9 +5,13 @@ if [ ! -f .env ]; then
   cp .env.example .env
 fi
 
-composer install --no-interaction --prefer-dist
+if [ "${SKIP_COMPOSER_INSTALL:-0}" != "1" ]; then
+  composer install --no-interaction --prefer-dist
+fi
 
-php artisan key:generate --force
+if [ -z "${APP_KEY:-}" ]; then
+  php artisan key:generate --force
+fi
 
 until php -r '
 try {
