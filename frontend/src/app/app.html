@@ -114,11 +114,9 @@
         (openUsuarios)="openUsuarios()"
         (openTickets)="openTickets()"
         (openActualizaciones)="openActualizaciones()"
-        (openKpiVtaOrilla)="openKpiVtaOrilla()"
-        (openKpiVtaPizzas)="openKpiVtaPizzas()"
-        (openKpiVtaAdicionales)="openKpiVtaAdicionales()"
-        (openKpiRptVtas)="openKpiRptVtas()"
-        (openKpiRptMalasOrdenes)="openKpiRptMalasOrdenes()"
+
+        (openKpiRptDia)="openKpiRptDia()"
+        (openKpiRptRango)="openKpiRptRango()"
         (logout)="logout()"
       />
 
@@ -133,14 +131,10 @@
             <app-admin-tickets />
           } @else if (currentSection() === 'actualizaciones') {
             <app-admin-actualizaciones />
-          } @else if (
-            currentSection() === 'kpis-vta-orilla'
-            || currentSection() === 'kpis-vta-pizzas'
-            || currentSection() === 'kpis-vta-adicionales'
-            || currentSection() === 'kpis-rpt-vtas'
-            || currentSection() === 'kpis-rpt-malas-ordenes'
-          ) {
-            <app-admin-kpis [reportType]="currentKpiReport()" />
+          } @else if (currentSection() === 'kpis-rpt-dia') {
+            <app-kpi-rpt-dia />
+          } @else if (currentSection() === 'kpis-rpt-rango') {
+            <app-kpi-rpt-rango />
           } @else {
           <!-- ── Dashboard ─────────────────────────────────────────── -->
           <div class="mb-6">

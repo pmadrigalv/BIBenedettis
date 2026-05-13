@@ -1,15 +1,14 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
 import { AdminActualizacionesComponent } from './components/admin-actualizaciones/admin-actualizaciones.component';
-import { AdminKpisComponent } from './components/admin-kpis/admin-kpis.component';
 import { AdminTicketsComponent } from './components/admin-tickets/admin-tickets.component';
 import { AdminUnidadesComponent } from './components/admin-unidades/admin-unidades.component';
 import { AdminUsuariosComponent } from './components/admin-usuarios/admin-usuarios.component';
+import { KpiRptDiaComponent } from './components/kpi-rpt-dia/kpi-rpt-dia.component';
+import { KpiRptRangoComponent } from './components/kpi-rpt-rango/kpi-rpt-rango.component';
 import { NavbarComponent } from './layout/navbar/navbar.component';
 import { SidebarComponent } from './layout/sidebar/sidebar.component';
 import { AuthService } from './services/auth.service';
-
-type KpiReportType = 'vta-orilla' | 'vta-pizzas' | 'vta-adicionales' | 'rpt-vtas' | 'rpt-malas-ordenes';
 
 type HealthResponse = {
   app: string;
@@ -25,7 +24,7 @@ type HealthResponse = {
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [AdminUnidadesComponent, AdminUsuariosComponent, AdminTicketsComponent, AdminActualizacionesComponent, AdminKpisComponent, SidebarComponent, NavbarComponent],
+  imports: [AdminUnidadesComponent, AdminUsuariosComponent, AdminTicketsComponent, AdminActualizacionesComponent, KpiRptDiaComponent, KpiRptRangoComponent, SidebarComponent, NavbarComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
@@ -54,13 +53,9 @@ export class App {
     | 'usuarios'
     | 'tickets'
     | 'actualizaciones'
-    | 'kpis-vta-orilla'
-    | 'kpis-vta-pizzas'
-    | 'kpis-vta-adicionales'
-    | 'kpis-rpt-vtas'
-    | 'kpis-rpt-malas-ordenes'
+    | 'kpis-rpt-dia'
+    | 'kpis-rpt-rango'
   >('dashboard');
-  protected readonly currentKpiReport = signal<KpiReportType>('vta-orilla');
   protected readonly health = signal<HealthResponse | null>(null);
   protected readonly status = signal<'loading' | 'online' | 'offline'>('loading');
   protected readonly errorMessage = signal('');
@@ -182,38 +177,15 @@ export class App {
     this.closeSidebar();
   }
 
-  protected openKpiVtaOrilla(event?: Event): void {
+  protected openKpiRptDia(event?: Event): void {
     event?.preventDefault();
-    this.currentKpiReport.set('vta-orilla');
-    this.currentSection.set('kpis-vta-orilla');
+    this.currentSection.set('kpis-rpt-dia');
     this.closeSidebar();
   }
 
-  protected openKpiVtaPizzas(event?: Event): void {
+  protected openKpiRptRango(event?: Event): void {
     event?.preventDefault();
-    this.currentKpiReport.set('vta-pizzas');
-    this.currentSection.set('kpis-vta-pizzas');
-    this.closeSidebar();
-  }
-
-  protected openKpiVtaAdicionales(event?: Event): void {
-    event?.preventDefault();
-    this.currentKpiReport.set('vta-adicionales');
-    this.currentSection.set('kpis-vta-adicionales');
-    this.closeSidebar();
-  }
-
-  protected openKpiRptVtas(event?: Event): void {
-    event?.preventDefault();
-    this.currentKpiReport.set('rpt-vtas');
-    this.currentSection.set('kpis-rpt-vtas');
-    this.closeSidebar();
-  }
-
-  protected openKpiRptMalasOrdenes(event?: Event): void {
-    event?.preventDefault();
-    this.currentKpiReport.set('rpt-malas-ordenes');
-    this.currentSection.set('kpis-rpt-malas-ordenes');
+    this.currentSection.set('kpis-rpt-rango');
     this.closeSidebar();
   }
 

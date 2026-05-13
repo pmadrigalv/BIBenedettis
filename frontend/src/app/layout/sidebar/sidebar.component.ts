@@ -7,11 +7,8 @@ export type LayoutSection =
   | 'usuarios'
   | 'tickets'
   | 'actualizaciones'
-  | 'kpis-vta-orilla'
-  | 'kpis-vta-pizzas'
-  | 'kpis-vta-adicionales'
-  | 'kpis-rpt-vtas'
-  | 'kpis-rpt-malas-ordenes';
+  | 'kpis-rpt-dia'
+  | 'kpis-rpt-rango';
 export type BackendStatus = 'loading' | 'online' | 'offline';
 
 @Component({
@@ -40,11 +37,8 @@ export class SidebarComponent {
   @Output() openUsuarios = new EventEmitter<void>();
   @Output() openTickets = new EventEmitter<void>();
   @Output() openActualizaciones = new EventEmitter<void>();
-  @Output() openKpiVtaOrilla = new EventEmitter<void>();
-  @Output() openKpiVtaPizzas = new EventEmitter<void>();
-  @Output() openKpiVtaAdicionales = new EventEmitter<void>();
-  @Output() openKpiRptVtas = new EventEmitter<void>();
-  @Output() openKpiRptMalasOrdenes = new EventEmitter<void>();
+  @Output() openKpiRptDia = new EventEmitter<void>();
+  @Output() openKpiRptRango = new EventEmitter<void>();
   @Output() logout = new EventEmitter<void>();
   @Output() close = new EventEmitter<void>();
 
@@ -93,29 +87,14 @@ export class SidebarComponent {
     this.openActualizaciones.emit();
   }
 
-  protected onOpenKpiVtaOrilla(event: Event): void {
+  protected onOpenKpiRptDia(event: Event): void {
     event.preventDefault();
-    this.openKpiVtaOrilla.emit();
+    this.openKpiRptDia.emit();
   }
 
-  protected onOpenKpiVtaPizzas(event: Event): void {
+  protected onOpenKpiRptRango(event: Event): void {
     event.preventDefault();
-    this.openKpiVtaPizzas.emit();
-  }
-
-  protected onOpenKpiVtaAdicionales(event: Event): void {
-    event.preventDefault();
-    this.openKpiVtaAdicionales.emit();
-  }
-
-  protected onOpenKpiRptVtas(event: Event): void {
-    event.preventDefault();
-    this.openKpiRptVtas.emit();
-  }
-
-  protected onOpenKpiRptMalasOrdenes(event: Event): void {
-    event.preventDefault();
-    this.openKpiRptMalasOrdenes.emit();
+    this.openKpiRptRango.emit();
   }
 
   protected onLogout(): void {

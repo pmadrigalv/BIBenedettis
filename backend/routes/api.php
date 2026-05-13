@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ActualizacionController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\KpiController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\UnidadController;
 use App\Http\Controllers\UsuarioController;
@@ -65,4 +66,14 @@ Route::middleware('auth.usuario')->group(function (): void {
     Route::put('/tickets/{ticket}/asignar-tecnico', [TicketController::class, 'assignTecnico']);
     Route::get('/actualizaciones', [ActualizacionController::class, 'index']);
     Route::post('/actualizaciones', [ActualizacionController::class, 'store']);
+
+    // ── KPIs ─────────────────────────────────────────────────────────────
+    Route::get('/kpis/vta-dia-dia', [KpiController::class, 'vtaDiaDia']);
+    Route::get('/kpis/native/vta-pizzas', [KpiController::class, 'nativeVtaPizzas']);
+    Route::get('/kpis/native/vta-adicionales', [KpiController::class, 'nativeVtaAdicionales']);
+    Route::get('/kpis/native/vta-orilla', [KpiController::class, 'nativeVtaOrilla']);
+    Route::get('/kpis/native/rpt-vtas', [KpiController::class, 'nativeRptVtas']);
+    Route::get('/kpis/native/rpt-malas-ordenes', [KpiController::class, 'nativeRptMalasOrdenes']);
+    Route::get('/kpis/rpt-dia', [KpiController::class, 'rptDia']);
+    Route::get('/kpis/rpt-rango', [KpiController::class, 'rptRango']);
 });

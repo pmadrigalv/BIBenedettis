@@ -1,0 +1,245 @@
+<div class="flex flex-col gap-4 p-4">
+
+  <!-- Controles -->
+  <div class="flex flex-wrap items-end gap-3">
+    <div class="flex flex-col gap-1">
+      <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Fecha</label>
+      <input
+        type="date"
+        [ngModel]="fecha()"
+        (ngModelChange)="onFechaChange($event)"
+        [max]="fecha()"
+        class="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+    </div>
+    <button
+      (click)="onActualizar()"
+      [disabled]="loading()"
+      class="bg-blue-600 text-white text-sm font-semibold px-5 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+    >
+      {{ loading() ? 'Cargando...' : 'Actualizar' }}
+    </button>
+  </div>
+
+  <!-- Error -->
+  @if (error()) {
+    <div class="bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded text-sm">{{ error() }}</div>
+  }
+
+  <!-- Sin datos -->
+  @if (!loading() && !data()) {
+    <div class="text-gray-400 text-sm italic mt-4">Selecciona una fecha y presiona Actualizar.</div>
+  }
+
+  <!-- Reporte -->
+  @if (data(); as d) {
+    <!-- Encabezado del período -->
+    <div class="bg-white border border-gray-200 rounded-lg px-4 py-3 shadow-sm">
+      <div class="text-base font-bold text-gray-800">{{ d.fecha_label | titlecase }}</div>
+      <div class="text-xs text-gray-500 mt-0.5">
+        Comparativo: {{ d.fecha_comparativa_label }}
+        &nbsp;·&nbsp;
+        <span class="font-semibold text-blue-700">FX {{ d.year_actual }}</span>
+        vs
+        <span class="font-semibold text-gray-600">FX {{ d.year_anterior }}</span>
+      </div>
+    </div>
+
+    <!-- Sin supervisores -->
+    @if (d.supervisores.length === 0) {
+      <div class="text-gray-400 text-sm italic">No hay unidades activas con supervisor para esta fecha.</div>
+    }
+
+    <!-- ── ACUMULADO POR DÍA ───────────────────────────────────────────── -->
+    @if (d.acumulado_semana.length > 0) {
+      @let tot2 = totalesAcumulado(d.acumulado_semana);
+      <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+        <div class="bg-emerald-700 px-4 py-2 text-white font-bold text-sm uppercase tracking-wide">
+          ACUMULADO POR DÍA — {{ d.semana_titulo }}
+        </div>
+        <div class="overflow-x-auto">
+          <table class="min-w-full text-xs">
+            <thead>
+              <tr class="bg-gray-50 border-b border-gray-200 text-gray-500 uppercase text-[10px] tracking-wide">
+                <th class="text-left px-3 py-2">DÍA</th>
+                <th class="text-right px-3 py-2">FX {{ d.year_anterior }}</th>
+                <th class="text-right px-3 py-2">FX {{ d.year_actual }}</th>
+                <th class="text-right px-3 py-2">% AP</th>
+                <th class="text-right px-3 py-2">VARIACIÓN $</th>
+                <th class="text-right px-3 py-2">PTO {{ d.year_actual }}</th>
+                <th class="text-right px-3 py-2">% AA</th>
+                <th class="text-right px-3 py-2">VARIACIÓN PTO</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (row of d.acumulado_semana; track row.fecha_actual) {
+                <tr class="border-b border-gray-100 hover:bg-emerald-50 transition-colors">
+                  <td class="px-3 py-2 font-medium text-gray-800">
+                    <div>{{ row.dia }}</div>
+                    <div class="text-gray-400 text-[10px]">{{ row.fecha_actual | date:'dd/MM/yyyy' }}</div>
+                  </td>
+                  <td class="px-3 py-2 text-right text-gray-600">{{ fmtMx(row.fx_ac) }}</td>
+                  <td class="px-3 py-2 text-right font-semibold text-gray-800">{{ fmtMx(row.fx_ap) }}</td>
+                  <td class="px-3 py-2 text-right font-semibold" [class]="pctClass(row.pct_ap)">{{ fmtPct(row.pct_ap) }}</td>
+                  <td class="px-3 py-2 text-right font-semibold" [class]="pctClass(row.var)">{{ fmtMx(row.var) }}</td>
+                  <td class="px-3 py-2 text-right text-gray-600">{{ fmtMx(row.pto) }}</td>
+                  <td class="px-3 py-2 text-right font-semibold" [class]="pctClass(row.pct_aa)">{{ fmtPct(row.pct_aa) }}</td>
+                  <td class="px-3 py-2 text-right font-semibold" [class]="pctClass(row.variacion_pto)">{{ fmtMx(row.variacion_pto) }}</td>
+                </tr>
+              }
+            </tbody>
+            <tfoot>
+              <tr class="bg-gray-100 font-bold border-t-2 border-gray-300 text-gray-800">
+                <td class="px-3 py-2">TOTAL IGUALES</td>
+                <td class="px-3 py-2 text-right">{{ fmtMx(tot2.fxAcIguales) }}</td>
+                <td class="px-3 py-2 text-right">{{ fmtMx(tot2.fxApIguales) }}</td>
+                <td class="px-3 py-2 text-right" [class]="pctClass(tot2.pctAp)">{{ fmtPct(tot2.pctAp) }}</td>
+                <td class="px-3 py-2 text-right" [class]="pctClass(tot2.var)">{{ fmtMx(tot2.var) }}</td>
+                <td class="px-3 py-2 text-right">{{ fmtMx(tot2.pto) }}</td>
+                <td class="px-3 py-2 text-right" [class]="pctClass(tot2.pctAa)">{{ fmtPct(tot2.pctAa) }}</td>
+                <td class="px-3 py-2 text-right" [class]="pctClass(tot2.varPto)">{{ fmtMx(tot2.varPto) }}</td>
+              </tr>
+              <tr class="bg-purple-50 font-bold text-purple-800 border-t border-gray-200">
+                <td class="px-3 py-2">TOTAL NUEVAS</td>
+                <td class="px-3 py-2 text-right">—</td>
+                <td class="px-3 py-2 text-right">{{ fmtMx(tot2.fxApNuevas) }}</td>
+                <td class="px-3 py-2 text-right">—</td>
+                <td class="px-3 py-2 text-right">—</td>
+                <td class="px-3 py-2 text-right">—</td>
+                <td class="px-3 py-2 text-right">—</td>
+                <td class="px-3 py-2 text-right">—</td>
+              </tr>
+              <tr class="bg-gray-200 font-bold border-t-2 border-gray-400 text-gray-900">
+                <td class="px-3 py-2">TOTAL</td>
+                <td class="px-3 py-2 text-right">{{ fmtMx(tot2.fxAcIguales) }}</td>
+                <td class="px-3 py-2 text-right">{{ fmtMx(tot2.fxApTotal) }}</td>
+                <td class="px-3 py-2 text-right" [class]="pctClass(tot2.pctAp)">{{ fmtPct(tot2.pctAp) }}</td>
+                <td class="px-3 py-2 text-right" [class]="pctClass(tot2.var)">{{ fmtMx(tot2.var) }}</td>
+                <td class="px-3 py-2 text-right">{{ fmtMx(tot2.pto) }}</td>
+                <td class="px-3 py-2 text-right" [class]="pctClass(tot2.pctAa)">{{ fmtPct(tot2.pctAa) }}</td>
+                <td class="px-3 py-2 text-right" [class]="pctClass(tot2.varPto)">{{ fmtMx(tot2.varPto) }}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    }
+
+    <!-- ── ACUMULADO POR SUPERVISOR ───────────────────────────────────── -->
+    @if (d.acumulado_supervisores.length > 0) {
+      <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+        <div class="bg-green-800 px-4 py-2 text-white font-bold text-sm uppercase tracking-wide">
+          ACUMULADO POR SUPERVISOR
+        </div>
+        <div class="overflow-x-auto">
+          <table class="min-w-full text-xs">
+            <thead>
+              <tr class="bg-gray-50 border-b border-gray-200 text-gray-500 uppercase text-[10px] tracking-wide">
+                <th class="text-left px-3 py-2">SUPERVISOR</th>
+                <th class="text-right px-3 py-2">FX {{ d.year_anterior }}</th>
+                <th class="text-right px-3 py-2">FX {{ d.year_actual }}</th>
+                <th class="text-right px-3 py-2">% AP</th>
+                <th class="text-right px-3 py-2">VARIACIÓN $</th>
+                <th class="text-right px-3 py-2">PTO {{ d.year_actual }}</th>
+                <th class="text-right px-3 py-2">% AA</th>
+                <th class="text-right px-3 py-2">VARIACIÓN PTO</th>
+              </tr>
+              <tr class="bg-gray-50 border-b border-gray-100 text-gray-400 text-[10px]">
+                <th class="px-3 py-1"></th>
+                <th class="px-3 py-1 text-right font-normal">{{ d.fecha_comparativa_label }}</th>
+                <th class="px-3 py-1 text-right font-normal">{{ d.fecha_label }}</th>
+                <th colspan="5"></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (sup of d.acumulado_supervisores; track sup.supervisor) {
+                <tr class="border-b border-gray-100 hover:bg-green-50 transition-colors">
+                  <td class="px-3 py-2 font-medium text-gray-800 whitespace-nowrap">{{ sup.supervisor }}</td>
+                  <td class="px-3 py-2 text-right text-gray-600">{{ fmtMx(sup.fx_ac) }}</td>
+                  <td class="px-3 py-2 text-right font-semibold text-gray-800">{{ fmtMx(sup.fx_ap) }}</td>
+                  <td class="px-3 py-2 text-right font-semibold" [class]="pctClass(sup.pct_ap)">{{ fmtPct(sup.pct_ap) }}</td>
+                  <td class="px-3 py-2 text-right font-semibold" [class]="pctClass(sup.var)">{{ fmtMx(sup.var) }}</td>
+                  <td class="px-3 py-2 text-right text-gray-600">{{ fmtMx(sup.presupuesto) }}</td>
+                  <td class="px-3 py-2 text-right font-semibold" [class]="pctClass(sup.pct_aa)">{{ fmtPct(sup.pct_aa) }}</td>
+                  <td class="px-3 py-2 text-right font-semibold" [class]="pctClass(sup.variacion_pto)">{{ fmtMx(sup.variacion_pto) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    }
+
+    <!-- Por supervisor -->
+    @for (sup of d.supervisores; track sup.id_supervisor) {
+      @let tot = totalSupervisor(sup);
+      <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+
+        <!-- Nombre supervisor -->
+        <div class="bg-gray-100 px-4 py-2 flex items-center justify-between">
+          <span class="text-sm font-bold text-gray-700 uppercase tracking-wide">{{ sup.supervisor }}</span>
+          <span class="text-xs text-gray-500">{{ sup.unidades.length }} unidades</span>
+        </div>
+
+        <!-- Tabla -->
+        <div class="overflow-x-auto">
+          <table class="min-w-full text-xs">
+            <thead>
+              <tr class="bg-gray-50 border-b border-gray-200 text-gray-500 uppercase text-[10px] tracking-wide">
+                <th class="text-left px-3 py-2">Unidad</th>
+                <th class="text-right px-3 py-2">FX {{ d.year_anterior }}</th>
+                <th class="text-right px-3 py-2">FX {{ d.year_actual }}</th>
+                <th class="text-right px-3 py-2">Var $</th>
+                <th class="text-right px-3 py-2">% AP</th>
+                <th class="text-right px-3 py-2">TXN ant</th>
+                <th class="text-right px-3 py-2">TXN act</th>
+                <th class="text-right px-3 py-2">Presupuesto</th>
+                <th class="text-right px-3 py-2">Var Pto</th>
+                <th class="text-right px-3 py-2">% AA</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (u of sup.unidades; track u.id_unidad) {
+                <tr class="border-b border-gray-100 hover:bg-blue-50 transition-colors">
+                  <td class="px-3 py-2 font-medium text-gray-800 whitespace-nowrap">
+                    {{ u.nombre_unidad }}
+                    @if (u.es_nueva) {
+                      <span class="ml-1 bg-blue-100 text-blue-700 text-[9px] font-bold px-1 rounded">NUEVA</span>
+                    }
+                  </td>
+                  <td class="px-3 py-2 text-right text-gray-600">{{ fmt(u.fx_ac) }}</td>
+                  <td class="px-3 py-2 text-right font-semibold text-gray-800">{{ fmt(u.fx_ap) }}</td>
+                  <td class="px-3 py-2 text-right" [class]="pctClass(u.var)">{{ fmt(u.var) }}</td>
+                  <td class="px-3 py-2 text-right font-semibold" [class]="pctClass(u.pct_ap)">{{ fmtPct(u.pct_ap) }}</td>
+                  <td class="px-3 py-2 text-right text-gray-600">{{ fmt(u.txn_ac) }}</td>
+                  <td class="px-3 py-2 text-right text-gray-800">{{ fmt(u.txn_ap) }}</td>
+                  <td class="px-3 py-2 text-right text-gray-600">{{ fmt(u.presupuesto) }}</td>
+                  <td class="px-3 py-2 text-right" [class]="pctClass(u.variacion_pto)">{{ fmt(u.variacion_pto) }}</td>
+                  <td class="px-3 py-2 text-right font-semibold" [class]="pctClass(u.pct_aa)">{{ fmtPct(u.pct_aa) }}</td>
+                </tr>
+              }
+            </tbody>
+            <!-- Total supervisor -->
+            <tfoot>
+              <tr class="bg-gray-100 font-bold border-t-2 border-gray-300 text-gray-800">
+                <td class="px-3 py-2">TOTAL</td>
+                <td class="px-3 py-2 text-right">{{ fmt(tot.fx_ac) }}</td>
+                <td class="px-3 py-2 text-right">{{ fmt(tot.fx_ap) }}</td>
+                <td class="px-3 py-2 text-right" [class]="pctClass(tot.var)">{{ fmt(tot.var) }}</td>
+                <td class="px-3 py-2 text-right" [class]="pctClass(tot.pct_ap)">{{ fmtPct(tot.pct_ap) }}</td>
+                <td class="px-3 py-2 text-right">{{ fmt(tot.txn_ac) }}</td>
+                <td class="px-3 py-2 text-right">{{ fmt(tot.txn_ap) }}</td>
+                <td class="px-3 py-2 text-right">{{ fmt(tot.presupuesto) }}</td>
+                <td class="px-3 py-2 text-right" [class]="pctClass(tot.variacion_pto)">{{ fmt(tot.variacion_pto) }}</td>
+                <td class="px-3 py-2 text-right" [class]="pctClass(tot.pct_aa)">{{ fmtPct(tot.pct_aa) }}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+      </div>
+    }
+  }
+
+
+</div>

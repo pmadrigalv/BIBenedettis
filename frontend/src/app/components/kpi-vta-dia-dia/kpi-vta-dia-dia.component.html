@@ -1,0 +1,174 @@
+<div class="space-y-5">
+
+  <!-- ── Header + Date Picker ──────────────────────────────────────────── -->
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Ventas Día a Día</h1>
+      <p class="mt-0.5 text-sm text-slate-500">Comparativo semanal: año actual vs año anterior vs presupuesto.</p>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <label class="text-xs font-semibold uppercase tracking-widest text-slate-500">Inicio de semana</label>
+      <input
+        type="date"
+        [ngModel]="fecha()"
+        (ngModelChange)="onFechaChange($event)"
+        class="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-800 shadow-sm outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-100"
+      />
+      <button
+        type="button"
+        (click)="cargar()"
+        [disabled]="loading()"
+        class="flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:opacity-50"
+      >
+        <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+        Actualizar
+      </button>
+    </div>
+  </div>
+
+  <!-- ── Error ─────────────────────────────────────────────────────────── -->
+  @if (error()) {
+    <div class="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+      <svg class="h-4 w-4 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+      {{ error() }}
+    </div>
+  }
+
+  <!-- ── Loading skeleton ──────────────────────────────────────────────── -->
+  @if (loading()) {
+    <div class="flex items-center justify-center py-20">
+      <div class="flex flex-col items-center gap-3">
+        <svg class="h-8 w-8 animate-spin text-emerald-500" viewBox="0 0 24 24" fill="none">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path>
+        </svg>
+        <p class="text-sm text-slate-500">Cargando reporte…</p>
+      </div>
+    </div>
+  }
+
+  <!-- ── Table ─────────────────────────────────────────────────────────── -->
+  @if (!loading() && data(); as report) {
+    <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white shadow-sm">
+
+      <!-- Table title header (green) -->
+      <div class="rounded-t-2xl bg-emerald-700 px-5 py-3 text-center text-sm font-bold uppercase tracking-wide text-white">
+        ACUMULADO POR DÍA — {{ report.semana }}
+      </div>
+
+      <table class="w-full min-w-[860px] border-collapse text-sm">
+        <!-- Column headers -->
+        <thead>
+          <tr class="bg-emerald-50">
+            <th class="border border-slate-200 px-4 py-2.5 text-left text-xs font-bold uppercase tracking-wide text-slate-700">DÍA</th>
+            <th class="border border-slate-200 px-4 py-2.5 text-right text-xs font-bold uppercase tracking-wide text-slate-700">FX {{ report.prev_year }}</th>
+            <th class="border border-slate-200 px-4 py-2.5 text-right text-xs font-bold uppercase tracking-wide text-slate-700">FX {{ report.year }}</th>
+            <th class="border border-slate-200 px-4 py-2.5 text-right text-xs font-bold uppercase tracking-wide text-slate-700">% AP</th>
+            <th class="border border-slate-200 px-4 py-2.5 text-right text-xs font-bold uppercase tracking-wide text-slate-700">VARIACIÓN $</th>
+            <th class="border border-slate-200 px-4 py-2.5 text-right text-xs font-bold uppercase tracking-wide text-slate-700">PTO {{ report.year }}</th>
+            <th class="border border-slate-200 px-4 py-2.5 text-right text-xs font-bold uppercase tracking-wide text-slate-700">% AA</th>
+            <th class="border border-slate-200 px-4 py-2.5 text-right text-xs font-bold uppercase tracking-wide text-slate-700">VARIACIÓN PTO</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <!-- Daily rows -->
+          @for (dia of report.dias; track dia.fecha) {
+            <tr class="transition-colors hover:bg-slate-50">
+              <!-- DÍA -->
+              <td class="border border-slate-200 px-4 py-2.5 font-medium text-slate-800">
+                <p class="font-semibold">{{ dia.nombre }}</p>
+                <p class="text-xs text-slate-400">{{ dia.fecha }}</p>
+              </td>
+              <!-- FX anterior -->
+              <td class="border border-slate-200 px-4 py-2.5 text-right font-mono text-slate-700">
+                {{ fmt(dia.fx_anterior) }}
+              </td>
+              <!-- FX actual -->
+              <td class="border border-slate-200 px-4 py-2.5 text-right font-mono text-slate-700">
+                {{ fmt(dia.fx_actual) }}
+              </td>
+              <!-- % AP -->
+              <td class="border border-slate-200 px-4 py-2.5 text-right font-mono" [class]="pctClass(dia.pct_ap)">
+                {{ fmtPct(dia.pct_ap) }}
+              </td>
+              <!-- VARIACIÓN $ -->
+              <td class="border border-slate-200 px-4 py-2.5 text-right font-mono" [class]="varClass(dia.variacion)">
+                {{ fmt(dia.variacion) }}
+              </td>
+              <!-- PTO -->
+              <td class="border border-slate-200 px-4 py-2.5 text-right font-mono text-slate-700">
+                {{ fmt(dia.pto) }}
+              </td>
+              <!-- % AA -->
+              <td class="border border-slate-200 px-4 py-2.5 text-right font-mono" [class]="pctClass(dia.pct_aa)">
+                {{ fmtPct(dia.pct_aa) }}
+              </td>
+              <!-- VARIACIÓN PTO -->
+              <td class="border border-slate-200 px-4 py-2.5 text-right font-mono" [class]="varClass(dia.variacion_pto)">
+                {{ fmt(dia.variacion_pto) }}
+              </td>
+            </tr>
+          }
+        </tbody>
+
+        <!-- Footer totals -->
+        <tfoot>
+          <!-- TOTAL IGUALES (green background) -->
+          <tr class="bg-emerald-700">
+            <td class="border border-emerald-600 px-4 py-2.5 text-xs font-bold uppercase text-white">TOTAL IGUALES</td>
+            <td class="border border-emerald-600 px-4 py-2.5 text-right font-mono text-sm font-bold text-white">{{ fmt(report.totales.iguales.fx_anterior) }}</td>
+            <td class="border border-emerald-600 px-4 py-2.5 text-right font-mono text-sm font-bold text-white">{{ fmt(report.totales.iguales.fx_actual) }}</td>
+            <td class="border border-emerald-600 px-4 py-2.5 text-right font-mono text-sm font-bold" [class]="pctClass(report.totales.iguales.pct_ap)">
+              {{ fmtPct(report.totales.iguales.pct_ap) }}
+            </td>
+            <td class="border border-emerald-600 px-4 py-2.5 text-right font-mono text-sm font-bold" [class]="varClass(report.totales.iguales.variacion)">
+              {{ fmt(report.totales.iguales.variacion) }}
+            </td>
+            <td class="border border-emerald-600 px-4 py-2.5 text-right font-mono text-sm font-bold text-white">{{ fmt(report.totales.iguales.pto) }}</td>
+            <td class="border border-emerald-600 px-4 py-2.5 text-right font-mono text-sm font-bold" [class]="pctClass(report.totales.iguales.pct_aa)">
+              {{ fmtPct(report.totales.iguales.pct_aa) }}
+            </td>
+            <td class="border border-emerald-600 px-4 py-2.5 text-right font-mono text-sm font-bold" [class]="varClass(report.totales.iguales.variacion_pto)">
+              {{ fmt(report.totales.iguales.variacion_pto) }}
+            </td>
+          </tr>
+
+          <!-- TOTAL NUEVAS (purple background) -->
+          <tr class="bg-purple-100">
+            <td class="border border-purple-200 px-4 py-2.5 text-xs font-bold uppercase text-purple-800">TOTAL NUEVAS</td>
+            <td class="border border-purple-200 px-4 py-2.5 text-right font-mono text-sm font-bold text-purple-600">-</td>
+            <td class="border border-purple-200 px-4 py-2.5 text-right font-mono text-sm font-bold text-purple-800">{{ fmt(report.totales.nuevas.fx_actual) }}</td>
+            <td class="border border-purple-200 px-4 py-2.5 text-right text-purple-500">-</td>
+            <td class="border border-purple-200 px-4 py-2.5 text-right text-purple-500">-</td>
+            <td class="border border-purple-200 px-4 py-2.5 text-right text-purple-500">-</td>
+            <td class="border border-purple-200 px-4 py-2.5 text-right text-purple-500">-</td>
+            <td class="border border-purple-200 px-4 py-2.5 text-right text-purple-500">-</td>
+          </tr>
+
+          <!-- TOTAL (dark green) -->
+          <tr class="bg-slate-800">
+            <td class="rounded-bl-2xl border border-slate-700 px-4 py-2.5 text-xs font-bold uppercase text-white">TOTAL</td>
+            <td class="border border-slate-700 px-4 py-2.5 text-right font-mono text-sm font-bold text-white">{{ fmt(report.totales.total.fx_anterior) }}</td>
+            <td class="border border-slate-700 px-4 py-2.5 text-right font-mono text-sm font-bold text-white">{{ fmt(report.totales.total.fx_actual) }}</td>
+            <td class="border border-slate-700 px-4 py-2.5 text-right font-mono text-sm font-bold" [class]="pctClass(report.totales.total.pct_ap)">
+              {{ fmtPct(report.totales.total.pct_ap) }}
+            </td>
+            <td class="border border-slate-700 px-4 py-2.5 text-right font-mono text-sm font-bold" [class]="varClass(report.totales.total.variacion)">
+              {{ fmt(report.totales.total.variacion) }}
+            </td>
+            <td class="border border-slate-700 px-4 py-2.5 text-right font-mono text-sm font-bold text-white">{{ fmt(report.totales.total.pto) }}</td>
+            <td class="border border-slate-700 px-4 py-2.5 text-right font-mono text-sm font-bold" [class]="pctClass(report.totales.total.pct_aa)">
+              {{ fmtPct(report.totales.total.pct_aa) }}
+            </td>
+            <td class="rounded-br-2xl border border-slate-700 px-4 py-2.5 text-right font-mono text-sm font-bold" [class]="varClass(report.totales.total.variacion_pto)">
+              {{ fmt(report.totales.total.variacion_pto) }}
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  }
+
+</div>
