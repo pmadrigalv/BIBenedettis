@@ -14,3 +14,9 @@ backend/database/data/*.frm
 backend/database/data/*.MYD
 backend/database/data/*.MYI
 backend/database/data/*.pid
+
+# Local legacy and backup folders
+/backupd/
+/backups/
+/BASE/
+/DATA/
