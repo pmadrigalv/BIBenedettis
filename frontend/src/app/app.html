@@ -117,6 +117,8 @@
 
         (openKpiRptDia)="openKpiRptDia()"
         (openKpiRptRango)="openKpiRptRango()"
+        (openKpiRptUnidad)="openKpiRptUnidad()"
+        (openKpiRptOrillas)="openKpiRptOrillas()"
         (logout)="logout()"
       />
 
@@ -135,6 +137,10 @@
             <app-kpi-rpt-dia />
           } @else if (currentSection() === 'kpis-rpt-rango') {
             <app-kpi-rpt-rango />
+          } @else if (currentSection() === 'kpis-rpt-unidad') {
+            <app-kpi-rpt-unidad />
+          } @else if (currentSection() === 'kpis-rpt-orillas') {
+            <app-kpi-rpt-orillas />
           } @else {
           <!-- ── Dashboard ─────────────────────────────────────────── -->
           <div class="mb-6">

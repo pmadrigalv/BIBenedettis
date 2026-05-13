@@ -45,6 +45,14 @@
       </div>
     </div>
 
+    @if (d.acumulado_semana.length > 0) {
+      <app-kpi-comparison-chart
+        title="Grafica semanal FX anterior vs actual"
+        [points]="chartSemanal(d.acumulado_semana)"
+        mode="currency"
+      />
+    }
+
     <!-- Sin supervisores -->
     @if (d.supervisores.length === 0) {
       <div class="text-gray-400 text-sm italic">No hay unidades activas con supervisor para esta fecha.</div>
@@ -127,6 +135,12 @@
 
     <!-- ── ACUMULADO POR SUPERVISOR ───────────────────────────────────── -->
     @if (d.acumulado_supervisores.length > 0) {
+      <app-kpi-comparison-chart
+        title="Grafica acumulado por supervisor"
+        [points]="chartAcumuladoSupervisores(d.acumulado_supervisores)"
+        mode="currency"
+      />
+
       <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
         <div class="bg-green-800 px-4 py-2 text-white font-bold text-sm uppercase tracking-wide">
           ACUMULADO POR SUPERVISOR
@@ -173,6 +187,12 @@
     <!-- Por supervisor -->
     @for (sup of d.supervisores; track sup.id_supervisor) {
       @let tot = totalSupervisor(sup);
+      <app-kpi-comparison-chart
+        title="Grafica por unidad - {{ sup.supervisor }}"
+        [points]="chartSupervisorUnidades(sup.unidades)"
+        mode="currency"
+      />
+
       <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
 
         <!-- Nombre supervisor -->

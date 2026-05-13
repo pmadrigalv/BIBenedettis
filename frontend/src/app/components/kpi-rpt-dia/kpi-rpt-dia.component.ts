@@ -1,12 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { KpisApiService, RptDiaAcumuladoDia, RptDiaResponse, RptDiaSupervisor, RptDiaUnidad } from '../../services/kpis-api.service';
+import { KpiComparisonChartComponent, KpiComparisonPoint } from '../shared/kpi-comparison-chart.component';
+import { KpisApiService, RptDiaAcumuladoDia, RptDiaAcumuladoSupervisor, RptDiaResponse, RptDiaSupervisor, RptDiaUnidad } from '../../services/kpis-api.service';
 
 @Component({
   selector: 'app-kpi-rpt-dia',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, KpiComparisonChartComponent],
   templateUrl: './kpi-rpt-dia.component.html',
 })
 export class KpiRptDiaComponent {
@@ -87,6 +88,30 @@ export class KpiRptDiaComponent {
 
   protected fmtMx(v: number): string {
     return new Intl.NumberFormat('es-MX', { style: 'currency', currency: 'MXN', minimumFractionDigits: 2 }).format(v);
+  }
+
+  protected chartSemanal(filas: RptDiaAcumuladoDia[]): KpiComparisonPoint[] {
+    return filas.map((f) => ({
+      label: f.dia,
+      prev: f.fx_ac,
+      current: f.fx_ap,
+    }));
+  }
+
+  protected chartAcumuladoSupervisores(filas: RptDiaAcumuladoSupervisor[]): KpiComparisonPoint[] {
+    return filas.map((f) => ({
+      label: f.supervisor,
+      prev: f.fx_ac,
+      current: f.fx_ap,
+    }));
+  }
+
+  protected chartSupervisorUnidades(unidades: RptDiaUnidad[]): KpiComparisonPoint[] {
+    return unidades.map((u) => ({
+      label: u.nombre_unidad,
+      prev: u.fx_ac ?? 0,
+      current: u.fx_ap,
+    }));
   }
 
   /** Totales acumulado semana: IGUALES y NUEVAS */

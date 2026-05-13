@@ -1,0 +1,139 @@
+<div class="flex flex-col gap-4 p-4">
+
+  <!-- Controles -->
+  <div class="flex flex-wrap items-end gap-3">
+    <div class="flex flex-col gap-1">
+      <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Unidad</label>
+      <select
+        [ngModel]="idUnidad()"
+        (ngModelChange)="onIdUnidadChange($event)"
+        class="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+      >
+        @for (u of unidades(); track u.id_unidad) {
+          <option [value]="u.id_unidad">{{ u.nombre_unidad }}</option>
+        }
+      </select>
+    </div>
+    <div class="flex flex-col gap-1">
+      <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Fecha inicio</label>
+      <input
+        type="date"
+        [ngModel]="fechaInicio()"
+        (ngModelChange)="onFechaInicioChange($event)"
+        class="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+      />
+    </div>
+    <div class="flex flex-col gap-1">
+      <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Fecha fin</label>
+      <input
+        type="date"
+        [ngModel]="fechaFin()"
+        (ngModelChange)="onFechaFinChange($event)"
+        class="border border-gray-300 rounded px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+      />
+    </div>
+    <button
+      (click)="onActualizar()"
+      [disabled]="loading()"
+      class="bg-amber-600 text-white text-sm font-semibold px-5 py-2 rounded hover:bg-amber-700 disabled:opacity-50"
+    >
+      {{ loading() ? 'Cargando...' : 'Actualizar' }}
+    </button>
+  </div>
+
+  <!-- Error -->
+  @if (error()) {
+    <div class="bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded text-sm">{{ error() }}</div>
+  }
+
+  <!-- Sin datos -->
+  @if (!loading() && !data()) {
+    <div class="text-gray-400 text-sm italic mt-4">Selecciona una unidad y rango de fechas, luego presiona Actualizar.</div>
+  }
+
+  <!-- Reporte -->
+  @if (data(); as d) {
+    <!-- Encabezado -->
+    <div class="bg-white border border-gray-200 rounded-lg px-4 py-3 shadow-sm">
+      <div class="text-base font-bold text-gray-800">Orillas — {{ d.nombre_unidad }}</div>
+      <div class="text-xs text-gray-500 mt-0.5">
+        {{ d.fecha_inicio | date:'dd/MM/yyyy' }} a {{ d.fecha_fin | date:'dd/MM/yyyy' }}
+        &nbsp;·&nbsp;
+        <span class="font-semibold text-amber-700">FX {{ d.year_actual }}</span>
+        vs
+        <span class="font-semibold text-gray-600">FX {{ d.year_anterior }}</span>
+        &nbsp;·&nbsp; comparativo {{ d.fecha_comp_inicio | date:'dd/MM/yyyy' }} a {{ d.fecha_comp_fin | date:'dd/MM/yyyy' }}
+      </div>
+    </div>
+
+    @if (d.orillas.length > 0) {
+      <app-kpi-comparison-chart
+        title="Grafica por tipo de orilla"
+        [points]="chartOrillas(d.orillas)"
+        mode="number"
+      />
+    }
+
+    <!-- Sin orillas -->
+    @if (d.orillas.length === 0) {
+      <div class="text-gray-400 text-sm italic">No hay datos de orillas para el período seleccionado.</div>
+    }
+
+    <!-- ── Tabla por receta de orilla ── -->
+    @for (orilla of d.orillas; track orilla.id_receta) {
+      @if (!orilla.sin_ventas) {
+        <app-kpi-comparison-chart
+          title="Grafica {{ orilla.nombre }} por tamanno"
+          [points]="chartOrillaFilas(orilla.filas)"
+          mode="number"
+        />
+      }
+
+      <div class="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
+        <div class="flex items-center justify-between bg-amber-700 px-4 py-2">
+          <span class="text-white font-bold text-sm uppercase tracking-wide">{{ orilla.nombre }}</span>
+          @if (orilla.sin_ventas) {
+            <span class="text-amber-200 text-xs italic">sin ventas en este período</span>
+          }
+        </div>
+
+        @if (!orilla.sin_ventas) {
+          <div class="overflow-x-auto">
+            <table class="min-w-full text-xs">
+              <thead>
+                <tr class="bg-gray-50 border-b border-gray-200 text-gray-500 uppercase text-[10px] tracking-wide">
+                  <th class="text-left px-3 py-2">TAMAÑO</th>
+                  <th class="text-right px-3 py-2">FX {{ d.year_anterior }}</th>
+                  <th class="text-right px-3 py-2">FX {{ d.year_actual }}</th>
+                  <th class="text-right px-3 py-2">% AP</th>
+                  <th class="text-right px-3 py-2">VARIACIÓN</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (fila of orilla.filas; track fila.id_tamanno) {
+                  <tr class="border-b border-gray-100 hover:bg-amber-50 transition-colors">
+                    <td class="px-3 py-2 font-medium text-gray-800">{{ fila.nombre }}</td>
+                    <td class="px-3 py-2 text-right text-gray-600">{{ fmt(fila.fx_prev) }}</td>
+                    <td class="px-3 py-2 text-right font-semibold text-gray-900">{{ fmt(fila.fx_actual) }}</td>
+                    <td class="px-3 py-2 text-right font-semibold" [ngClass]="pctClass(fila.pct_ap)">{{ fmtPct(fila.pct_ap) }}</td>
+                    <td class="px-3 py-2 text-right" [ngClass]="pctClass(fila.variacion)">{{ fmt(fila.variacion) }}</td>
+                  </tr>
+                }
+              </tbody>
+              <tfoot>
+                <tr class="bg-amber-50 border-t-2 border-amber-200 font-bold text-xs">
+                  <td class="px-3 py-2 text-gray-700">TOTAL</td>
+                  <td class="px-3 py-2 text-right text-gray-600">{{ fmt(orilla.total_prev) }}</td>
+                  <td class="px-3 py-2 text-right text-gray-900">{{ fmt(orilla.total_actual) }}</td>
+                  <td class="px-3 py-2 text-right" [ngClass]="pctClass(orilla.total_pct_ap)">{{ fmtPct(orilla.total_pct_ap) }}</td>
+                  <td class="px-3 py-2 text-right" [ngClass]="pctClass(orilla.total_var)">{{ fmt(orilla.total_var) }}</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        }
+      </div>
+    }
+  }
+
+</div>

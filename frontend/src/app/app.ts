@@ -6,6 +6,8 @@ import { AdminUnidadesComponent } from './components/admin-unidades/admin-unidad
 import { AdminUsuariosComponent } from './components/admin-usuarios/admin-usuarios.component';
 import { KpiRptDiaComponent } from './components/kpi-rpt-dia/kpi-rpt-dia.component';
 import { KpiRptRangoComponent } from './components/kpi-rpt-rango/kpi-rpt-rango.component';
+import { KpiRptUnidadComponent } from './components/kpi-rpt-unidad/kpi-rpt-unidad.component';
+import { KpiRptOrillasComponent } from './components/kpi-rpt-orillas/kpi-rpt-orillas.component';
 import { NavbarComponent } from './layout/navbar/navbar.component';
 import { SidebarComponent } from './layout/sidebar/sidebar.component';
 import { AuthService } from './services/auth.service';
@@ -24,7 +26,7 @@ type HealthResponse = {
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [AdminUnidadesComponent, AdminUsuariosComponent, AdminTicketsComponent, AdminActualizacionesComponent, KpiRptDiaComponent, KpiRptRangoComponent, SidebarComponent, NavbarComponent],
+  imports: [AdminUnidadesComponent, AdminUsuariosComponent, AdminTicketsComponent, AdminActualizacionesComponent, KpiRptDiaComponent, KpiRptRangoComponent, KpiRptUnidadComponent, KpiRptOrillasComponent, SidebarComponent, NavbarComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
@@ -55,6 +57,8 @@ export class App {
     | 'actualizaciones'
     | 'kpis-rpt-dia'
     | 'kpis-rpt-rango'
+    | 'kpis-rpt-unidad'
+    | 'kpis-rpt-orillas'
   >('dashboard');
   protected readonly health = signal<HealthResponse | null>(null);
   protected readonly status = signal<'loading' | 'online' | 'offline'>('loading');
@@ -186,6 +190,18 @@ export class App {
   protected openKpiRptRango(event?: Event): void {
     event?.preventDefault();
     this.currentSection.set('kpis-rpt-rango');
+    this.closeSidebar();
+  }
+
+  protected openKpiRptUnidad(event?: Event): void {
+    event?.preventDefault();
+    this.currentSection.set('kpis-rpt-unidad');
+    this.closeSidebar();
+  }
+
+  protected openKpiRptOrillas(event?: Event): void {
+    event?.preventDefault();
+    this.currentSection.set('kpis-rpt-orillas');
     this.closeSidebar();
   }
 

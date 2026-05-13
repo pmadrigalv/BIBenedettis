@@ -106,6 +106,22 @@ export class KpisApiService {
       .set('fecha_fin', fechaFin);
     return this.http.get<RptRangoResponse>('/api/kpis/rpt-rango', { params });
   }
+
+  rptUnidad(idUnidad: number, fechaInicio: string, fechaFin: string): Observable<RptUnidadResponse> {
+    const params = new HttpParams()
+      .set('id_unidad', idUnidad.toString())
+      .set('fecha_inicio', fechaInicio)
+      .set('fecha_fin', fechaFin);
+    return this.http.get<RptUnidadResponse>('/api/kpis/rpt-unidad', { params });
+  }
+
+  rptOrillas(idUnidad: number, fechaInicio: string, fechaFin: string): Observable<RptOrillasResponse> {
+    const params = new HttpParams()
+      .set('id_unidad', idUnidad.toString())
+      .set('fecha_inicio', fechaInicio)
+      .set('fecha_fin', fechaFin);
+    return this.http.get<RptOrillasResponse>('/api/kpis/rpt-orillas', { params });
+  }
 }
 
 // ── Interfaces para RPT DIA ────────────────────────────────────────────────
@@ -187,4 +203,86 @@ export interface RptRangoResponse {
   supervisores: RptDiaSupervisor[];
   acumulado_semana: RptDiaAcumuladoDia[];
   acumulado_supervisores: RptDiaAcumuladoSupervisor[];
+}
+
+// ── Interfaces para RPT UNIDAD (Rep.Ventas) ───────────────────────────────
+export interface RptUnidadFila {
+  id_tamanno: number;
+  nombre: string;
+  fx_prev: number;
+  fx_actual: number;
+  pct_ap: number | null;
+  variacion: number;
+}
+
+export interface RptUnidadCategoria {
+  tipo: string;
+  slug: string;
+  filas: RptUnidadFila[];
+  total_prev: number;
+  total_actual: number;
+  total_pct_ap: number | null;
+  total_var: number;
+}
+
+export interface RptUnidadPromocion {
+  id_esquemacobro: number;
+  nombre: string;
+  fx_prev: number;
+  fx_actual: number;
+  pct_ap: number | null;
+  variacion: number;
+}
+
+export interface RptUnidadResponse {
+  id_unidad: number;
+  nombre_unidad: string;
+  fecha_inicio: string;
+  fecha_fin: string;
+  fecha_comp_inicio: string;
+  fecha_comp_fin: string;
+  year_actual: number;
+  year_anterior: number;
+  categorias: RptUnidadCategoria[];
+  promociones: RptUnidadPromocion[];
+  total_promociones: {
+    fx_prev: number;
+    fx_actual: number;
+    pct_ap: number | null;
+    variacion: number;
+  };
+}
+
+// ── Interfaces para RPT ORILLAS ───────────────────────────────────────────
+export interface RptOrillasFila {
+  id_tamanno: number;
+  nombre: string;
+  fx_prev: number;
+  fx_actual: number;
+  pct_ap: number | null;
+  variacion: number;
+}
+
+export interface RptOrillasReceta {
+  id_receta: number;
+  nombre: string;
+  slug: string;
+  filas: RptOrillasFila[];
+  total_prev: number;
+  total_actual: number;
+  total_pct_ap: number | null;
+  total_var: number;
+  sin_ventas: boolean;
+}
+
+export interface RptOrillasResponse {
+  id_unidad: number;
+  nombre_unidad: string;
+  fecha_inicio: string;
+  fecha_fin: string;
+  fecha_comp_inicio: string;
+  fecha_comp_fin: string;
+  year_actual: number;
+  year_anterior: number;
+  orillas: RptOrillasReceta[];
 }

@@ -20,3 +20,5 @@ backend/database/data/*.pid
 /backups/
 /BASE/
 /DATA/
+/vmxrpld/
+/rplgen/

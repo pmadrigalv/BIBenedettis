@@ -76,4 +76,6 @@ Route::middleware('auth.usuario')->group(function (): void {
     Route::get('/kpis/native/rpt-malas-ordenes', [KpiController::class, 'nativeRptMalasOrdenes']);
     Route::get('/kpis/rpt-dia', [KpiController::class, 'rptDia']);
     Route::get('/kpis/rpt-rango', [KpiController::class, 'rptRango']);
+    Route::get('/kpis/rpt-unidad', [KpiController::class, 'rptUnidad']);
+    Route::get('/kpis/rpt-orillas', [KpiController::class, 'rptOrillas']);
 });

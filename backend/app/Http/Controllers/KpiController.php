@@ -1445,4 +1445,494 @@ class KpiController extends Controller
 
         return $missing;
     }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // RPT UNIDAD — Rep.Ventas por tamaño y promociones (BASE/ modo=unidad)
+    // Params: id_unidad, fecha_inicio, fecha_fin
+    // ─────────────────────────────────────────────────────────────────────
+    public function rptUnidad(Request $request): JsonResponse
+    {
+        $request->validate([
+            'id_unidad'    => 'required|integer|min:1',
+            'fecha_inicio' => 'required|date_format:Y-m-d',
+            'fecha_fin'    => 'required|date_format:Y-m-d',
+        ]);
+
+        $idUnidad       = (int) $request->input('id_unidad');
+        $fechaInicioStr = $request->input('fecha_inicio');
+        $fechaFinStr    = $request->input('fecha_fin');
+
+        $fechaInicio = Carbon::parse($fechaInicioStr)->startOfDay();
+        $fechaFin    = Carbon::parse($fechaFinStr)->startOfDay();
+
+        if ($fechaFin->lt($fechaInicio)) {
+            [$fechaInicio, $fechaFin]       = [$fechaFin, $fechaInicio];
+            [$fechaInicioStr, $fechaFinStr] = [$fechaFinStr, $fechaInicioStr];
+        }
+
+        $fechaCompInicio = $fechaInicio->copy()->subDays(364);
+        $fechaCompFin    = $fechaFin->copy()->subDays(364);
+
+        $dioInicio     = $this->dateToDiaOperativo($fechaInicio);
+        $dioFin        = $this->dateToDiaOperativo($fechaFin);
+        $dioCompInicio = $this->dateToDiaOperativo($fechaCompInicio);
+        $dioCompFin    = $this->dateToDiaOperativo($fechaCompFin);
+
+        // Nombre de unidad
+        $nombreUnidad = 'Unidad ' . $idUnidad;
+        foreach (['unidad', 'unidades'] as $tablaU) {
+            if (Schema::hasTable($tablaU)) {
+                $rowU = DB::table($tablaU)->where('id_unidad', $idUnidad)->first(['nombre_unidad']);
+                if ($rowU) {
+                    $nombreUnidad = trim($rowU->nombre_unidad ?? '') ?: $nombreUnidad;
+                }
+                break;
+            }
+        }
+
+        // Required tables check
+        $missing = $this->missingTables(['vmx_diaoperativo', 'vmx_orden', 'vmx_producto', 'tamanno']);
+        if (!empty($missing)) {
+            return response()->json(['error' => 'Tablas faltantes: ' . implode(', ', $missing)], 422);
+        }
+
+        // ── Order ranges for actual and comparative periods ──
+        $rangeActual = DB::table('vmx_diaoperativo')
+            ->where('id_unidad', $idUnidad)
+            ->whereBetween('id_diaoperativo', [$dioInicio, $dioFin])
+            ->selectRaw('MIN(oinicial_diaoperativo) as min_orden, MAX(ofinal_diaoperativo) as max_orden')
+            ->first();
+
+        $rangeComp = DB::table('vmx_diaoperativo')
+            ->where('id_unidad', $idUnidad)
+            ->whereBetween('id_diaoperativo', [$dioCompInicio, $dioCompFin])
+            ->selectRaw('MIN(oinicial_diaoperativo) as min_orden, MAX(ofinal_diaoperativo) as max_orden')
+            ->first();
+
+        // ── Tamaños vigentes grouped by tipo ──
+        $tamanoRows = DB::table('tamanno')
+            ->where('vigencia_tamanno', 1)
+            ->orderBy('tipo')
+            ->orderByRaw("COALESCE(NULLIF(TRIM(descripcion_tamanno), ''), CONCAT('TAMANNO #', id_tamanno))")
+            ->get(['id_tamanno', 'descripcion_tamanno', 'abreviatura_tamanno', 'tipo']);
+
+        $catalogoTamannoPorTipo = [];
+        foreach ($tamanoRows as $t) {
+            $tipo   = strtoupper(trim($t->tipo ?? '')) ?: 'SIN TIPO';
+            $nombre = trim($t->descripcion_tamanno ?? '') ?: trim($t->abreviatura_tamanno ?? '') ?: ('TAMANNO #' . $t->id_tamanno);
+            if (!isset($catalogoTamannoPorTipo[$tipo])) {
+                $catalogoTamannoPorTipo[$tipo] = [];
+            }
+            $catalogoTamannoPorTipo[$tipo][(int) $t->id_tamanno] = $nombre;
+        }
+
+        // IDs excluded from regular sales (promotional schemes)
+        $excludeEsquemas = [1, 1000, 1001, 1002, 1003, 1004, 1005];
+
+        // ── Quantities per tamanno (actual) ──
+        $cantActualPorTamanno = collect();
+        if ($rangeActual && $rangeActual->min_orden !== null) {
+            $q = DB::table('vmx_orden as o')
+                ->join('vmx_producto as p', function ($j) {
+                    $j->on('p.id_unidad', '=', 'o.id_unidad')->on('p.id_orden', '=', 'o.id_orden');
+                })
+                ->where('o.id_unidad', $idUnidad)
+                ->where('o.consec_orden', '>', 0)
+                ->whereBetween('o.id_orden', [$rangeActual->min_orden, $rangeActual->max_orden]);
+
+            if (Schema::hasColumn('vmx_producto', 'id_esquemacobro')) {
+                $q->where(function ($wq) use ($excludeEsquemas) {
+                    $wq->whereNull('p.id_esquemacobro')
+                       ->orWhereNotIn('p.id_esquemacobro', $excludeEsquemas);
+                });
+            }
+
+            $cantActualPorTamanno = $q->groupBy('p.id_tamanno')
+                ->select('p.id_tamanno', DB::raw('SUM(p.cantidad_producto) as cantidad'))
+                ->pluck('cantidad', 'p.id_tamanno');
+        }
+
+        // ── Quantities per tamanno (comparative) ──
+        $cantCompPorTamanno = collect();
+        if ($rangeComp && $rangeComp->min_orden !== null) {
+            $q = DB::table('vmx_orden as o')
+                ->join('vmx_producto as p', function ($j) {
+                    $j->on('p.id_unidad', '=', 'o.id_unidad')->on('p.id_orden', '=', 'o.id_orden');
+                })
+                ->where('o.id_unidad', $idUnidad)
+                ->where('o.consec_orden', '>', 0)
+                ->whereBetween('o.id_orden', [$rangeComp->min_orden, $rangeComp->max_orden]);
+
+            if (Schema::hasColumn('vmx_producto', 'id_esquemacobro')) {
+                $q->where(function ($wq) use ($excludeEsquemas) {
+                    $wq->whereNull('p.id_esquemacobro')
+                       ->orWhereNotIn('p.id_esquemacobro', $excludeEsquemas);
+                });
+            }
+
+            $cantCompPorTamanno = $q->groupBy('p.id_tamanno')
+                ->select('p.id_tamanno', DB::raw('SUM(p.cantidad_producto) as cantidad'))
+                ->pluck('cantidad', 'p.id_tamanno');
+        }
+
+        // ── Build categorias ──
+        $categorias = [];
+        foreach ($catalogoTamannoPorTipo as $tipo => $idNombrePorId) {
+            $filas       = [];
+            $totalPrev   = 0.0;
+            $totalActual = 0.0;
+
+            foreach ($idNombrePorId as $idTamanno => $nombreTamanno) {
+                $prev   = (float) ($cantCompPorTamanno[$idTamanno]   ?? 0);
+                $actual = (float) ($cantActualPorTamanno[$idTamanno] ?? 0);
+                if ($prev <= 0 && $actual <= 0) {
+                    continue;
+                }
+
+                $var = $actual - $prev;
+                $pct = $prev > 0 ? round(($var / $prev) * 100, 1) : null;
+
+                $totalPrev   += $prev;
+                $totalActual += $actual;
+
+                $filas[] = [
+                    'id_tamanno' => $idTamanno,
+                    'nombre'     => $nombreTamanno,
+                    'fx_prev'    => round($prev, 1),
+                    'fx_actual'  => round($actual, 1),
+                    'pct_ap'     => $pct,
+                    'variacion'  => round($var, 1),
+                ];
+            }
+
+            if (empty($filas)) {
+                continue;
+            }
+
+            $varTotal = $totalActual - $totalPrev;
+            $pctTotal = $totalPrev > 0 ? round(($varTotal / $totalPrev) * 100, 1) : null;
+            $slug     = strtolower((string) preg_replace('/[^a-z0-9]+/i', '-', $tipo));
+
+            $categorias[] = [
+                'tipo'         => $tipo,
+                'slug'         => $slug,
+                'filas'        => $filas,
+                'total_prev'   => round($totalPrev, 1),
+                'total_actual' => round($totalActual, 1),
+                'total_pct_ap' => $pctTotal,
+                'total_var'    => round($varTotal, 1),
+            ];
+        }
+
+        // ── Promotional tickets ──
+        $promociones = [];
+        $tablaEsquema = null;
+        foreach (['esquema_cobro', 'esquemacobro'] as $t) {
+            if (Schema::hasTable($t)) {
+                $tablaEsquema = $t;
+                break;
+            }
+        }
+
+        if ($tablaEsquema !== null) {
+            $esquemasRaw = DB::table($tablaEsquema)->get();
+            $catalogoEsquemas = [];
+            foreach ($esquemasRaw as $es) {
+                $data = (array) $es;
+                $idEsquema = null;
+                foreach (['id_esquemacobro', 'id_esquema_cobro', 'idesquemacobro'] as $k) {
+                    if (isset($data[$k])) {
+                        $idEsquema = (int) $data[$k];
+                        break;
+                    }
+                }
+                if ($idEsquema === null || $idEsquema <= 0 || in_array($idEsquema, $excludeEsquemas)) {
+                    continue;
+                }
+                $nombre = '';
+                foreach (['nombre_esquema_cobro', 'nombre_esquemacobro', 'descripcion', 'nombre'] as $nk) {
+                    if (!empty($data[$nk])) {
+                        $nombre = trim($data[$nk]);
+                        break;
+                    }
+                }
+                $catalogoEsquemas[$idEsquema] = $nombre ?: ('ESQUEMA #' . $idEsquema);
+            }
+
+            if (!empty($catalogoEsquemas) && Schema::hasColumn('vmx_orden', 'id_esquemacobro')) {
+                $ticketsActual = collect();
+                $ticketsComp   = collect();
+
+                if ($rangeActual && $rangeActual->min_orden !== null) {
+                    $ticketsActual = DB::table('vmx_orden')
+                        ->where('id_unidad', $idUnidad)
+                        ->where('consec_orden', '>', 0)
+                        ->whereBetween('id_orden', [$rangeActual->min_orden, $rangeActual->max_orden])
+                        ->whereNotNull('id_esquemacobro')
+                        ->whereNotIn('id_esquemacobro', $excludeEsquemas)
+                        ->groupBy('id_esquemacobro')
+                        ->select('id_esquemacobro', DB::raw('COUNT(DISTINCT id_orden) as tickets'))
+                        ->pluck('tickets', 'id_esquemacobro');
+                }
+
+                if ($rangeComp && $rangeComp->min_orden !== null) {
+                    $ticketsComp = DB::table('vmx_orden')
+                        ->where('id_unidad', $idUnidad)
+                        ->where('consec_orden', '>', 0)
+                        ->whereBetween('id_orden', [$rangeComp->min_orden, $rangeComp->max_orden])
+                        ->whereNotNull('id_esquemacobro')
+                        ->whereNotIn('id_esquemacobro', $excludeEsquemas)
+                        ->groupBy('id_esquemacobro')
+                        ->select('id_esquemacobro', DB::raw('COUNT(DISTINCT id_orden) as tickets'))
+                        ->pluck('tickets', 'id_esquemacobro');
+                }
+
+                foreach ($catalogoEsquemas as $idEsquema => $nombreEsquema) {
+                    $prev   = (float) ($ticketsComp[$idEsquema]   ?? 0);
+                    $actual = (float) ($ticketsActual[$idEsquema] ?? 0);
+                    if ($prev <= 0 && $actual <= 0) {
+                        continue;
+                    }
+
+                    $var = $actual - $prev;
+                    $pct = $prev > 0 ? round(($var / $prev) * 100, 1) : null;
+
+                    $promociones[] = [
+                        'id_esquemacobro' => $idEsquema,
+                        'nombre'          => $nombreEsquema,
+                        'fx_prev'         => (int) round($prev),
+                        'fx_actual'       => (int) round($actual),
+                        'pct_ap'          => $pct,
+                        'variacion'       => (int) round($var),
+                    ];
+                }
+            }
+        }
+
+        $totalPromosPrev   = (float) array_sum(array_column($promociones, 'fx_prev'));
+        $totalPromosActual = (float) array_sum(array_column($promociones, 'fx_actual'));
+        $totalPromosVar    = $totalPromosActual - $totalPromosPrev;
+        $totalPromosPct    = $totalPromosPrev > 0 ? round(($totalPromosVar / $totalPromosPrev) * 100, 1) : null;
+
+        return response()->json([
+            'id_unidad'         => $idUnidad,
+            'nombre_unidad'     => $nombreUnidad,
+            'fecha_inicio'      => $fechaInicioStr,
+            'fecha_fin'         => $fechaFinStr,
+            'fecha_comp_inicio' => $fechaCompInicio->format('Y-m-d'),
+            'fecha_comp_fin'    => $fechaCompFin->format('Y-m-d'),
+            'year_actual'       => $fechaFin->year,
+            'year_anterior'     => $fechaCompFin->year,
+            'categorias'        => $categorias,
+            'promociones'       => $promociones,
+            'total_promociones' => [
+                'fx_prev'   => (int) round($totalPromosPrev),
+                'fx_actual' => (int) round($totalPromosActual),
+                'pct_ap'    => $totalPromosPct,
+                'variacion' => (int) round($totalPromosVar),
+            ],
+        ]);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────
+    // RPT ORILLAS — Conteo de orillas por receta y tamaño de pizza
+    // Params: id_unidad, fecha_inicio, fecha_fin
+    // ─────────────────────────────────────────────────────────────────────
+    public function rptOrillas(Request $request): JsonResponse
+    {
+        $request->validate([
+            'id_unidad'    => 'required|integer|min:1',
+            'fecha_inicio' => 'required|date_format:Y-m-d',
+            'fecha_fin'    => 'required|date_format:Y-m-d',
+        ]);
+
+        $idUnidad       = (int) $request->input('id_unidad');
+        $fechaInicioStr = $request->input('fecha_inicio');
+        $fechaFinStr    = $request->input('fecha_fin');
+
+        $fechaInicio = Carbon::parse($fechaInicioStr)->startOfDay();
+        $fechaFin    = Carbon::parse($fechaFinStr)->startOfDay();
+
+        if ($fechaFin->lt($fechaInicio)) {
+            [$fechaInicio, $fechaFin]       = [$fechaFin, $fechaInicio];
+            [$fechaInicioStr, $fechaFinStr] = [$fechaFinStr, $fechaInicioStr];
+        }
+
+        $fechaCompInicio = $fechaInicio->copy()->subDays(364);
+        $fechaCompFin    = $fechaFin->copy()->subDays(364);
+
+        $dioInicio     = $this->dateToDiaOperativo($fechaInicio);
+        $dioFin        = $this->dateToDiaOperativo($fechaFin);
+        $dioCompInicio = $this->dateToDiaOperativo($fechaCompInicio);
+        $dioCompFin    = $this->dateToDiaOperativo($fechaCompFin);
+
+        // Nombre de unidad
+        $nombreUnidad = 'Unidad ' . $idUnidad;
+        foreach (['unidad', 'unidades'] as $tablaU) {
+            if (Schema::hasTable($tablaU)) {
+                $rowU = DB::table($tablaU)->where('id_unidad', $idUnidad)->first(['nombre_unidad']);
+                if ($rowU) {
+                    $nombreUnidad = trim($rowU->nombre_unidad ?? '') ?: $nombreUnidad;
+                }
+                break;
+            }
+        }
+
+        // Required tables check
+        $missing = $this->missingTables(['vmx_diaoperativo', 'vmx_orden', 'vmx_producto', 'vmx_componente', 'tamanno']);
+        if (!empty($missing)) {
+            return response()->json(['error' => 'Tablas faltantes: ' . implode(', ', $missing)], 422);
+        }
+
+        // Pizza tamaños
+        $pizzaTamanos = DB::table('tamanno')
+            ->where('vigencia_tamanno', 1)
+            ->whereRaw("UPPER(TRIM(tipo)) LIKE '%PIZZA%'")
+            ->orderByRaw("COALESCE(NULLIF(TRIM(descripcion_tamanno), ''), CONCAT('TAMANNO #', id_tamanno))")
+            ->get(['id_tamanno', 'descripcion_tamanno', 'abreviatura_tamanno']);
+
+        if ($pizzaTamanos->isEmpty()) {
+            return response()->json([
+                'id_unidad'     => $idUnidad,
+                'nombre_unidad' => $nombreUnidad,
+                'fecha_inicio'  => $fechaInicioStr,
+                'fecha_fin'     => $fechaFinStr,
+                'year_actual'   => $fechaFin->year,
+                'year_anterior' => $fechaCompFin->year,
+                'orillas'       => [],
+                'mensaje'       => 'No se encontraron tamaños de pizza en el catálogo.',
+            ]);
+        }
+
+        $catalogoPizzaTamanos = [];
+        $idsPizzaTamanos      = [];
+        foreach ($pizzaTamanos as $t) {
+            $nombre = trim($t->descripcion_tamanno ?? '') ?: trim($t->abreviatura_tamanno ?? '') ?: ('TAMANNO #' . $t->id_tamanno);
+            $id = (int) $t->id_tamanno;
+            $idsPizzaTamanos[]         = $id;
+            $catalogoPizzaTamanos[$id] = $nombre;
+        }
+
+        // Order ranges
+        $rangeActual = DB::table('vmx_diaoperativo')
+            ->where('id_unidad', $idUnidad)
+            ->whereBetween('id_diaoperativo', [$dioInicio, $dioFin])
+            ->selectRaw('MIN(oinicial_diaoperativo) as min_orden, MAX(ofinal_diaoperativo) as max_orden')
+            ->first();
+
+        $rangeComp = DB::table('vmx_diaoperativo')
+            ->where('id_unidad', $idUnidad)
+            ->whereBetween('id_diaoperativo', [$dioCompInicio, $dioCompFin])
+            ->selectRaw('MIN(oinicial_diaoperativo) as min_orden, MAX(ofinal_diaoperativo) as max_orden')
+            ->first();
+
+        // Orilla recipes
+        $tiposOrilla = [
+            82  => 'Orilla queso',
+            590 => 'Orilla queso habanero',
+            591 => 'Orilla queso chipotle',
+            592 => 'Orilla queso bbq',
+        ];
+
+        $orillas = [];
+        foreach ($tiposOrilla as $idReceta => $nombreReceta) {
+            $cantActual = collect();
+            $cantComp   = collect();
+
+            if ($rangeActual && $rangeActual->min_orden !== null) {
+                $cantActual = DB::table('vmx_orden as o')
+                    ->join('vmx_producto as p', function ($j) {
+                        $j->on('p.id_unidad', '=', 'o.id_unidad')->on('p.id_orden', '=', 'o.id_orden');
+                    })
+                    ->join('vmx_componente as c', function ($j) {
+                        $j->on('c.id_unidad', '=', 'p.id_unidad')
+                          ->on('c.id_orden', '=', 'p.id_orden')
+                          ->on('c.id_producto', '=', 'p.id_producto');
+                    })
+                    ->where('o.id_unidad', $idUnidad)
+                    ->where('o.consec_orden', '>', 0)
+                    ->whereBetween('o.id_orden', [$rangeActual->min_orden, $rangeActual->max_orden])
+                    ->whereIn('p.id_tamanno', $idsPizzaTamanos)
+                    ->where('c.id_receta', $idReceta)
+                    ->groupBy('p.id_tamanno')
+                    ->select('p.id_tamanno', DB::raw('SUM(p.cantidad_producto) as cantidad'))
+                    ->pluck('cantidad', 'p.id_tamanno');
+            }
+
+            if ($rangeComp && $rangeComp->min_orden !== null) {
+                $cantComp = DB::table('vmx_orden as o')
+                    ->join('vmx_producto as p', function ($j) {
+                        $j->on('p.id_unidad', '=', 'o.id_unidad')->on('p.id_orden', '=', 'o.id_orden');
+                    })
+                    ->join('vmx_componente as c', function ($j) {
+                        $j->on('c.id_unidad', '=', 'p.id_unidad')
+                          ->on('c.id_orden', '=', 'p.id_orden')
+                          ->on('c.id_producto', '=', 'p.id_producto');
+                    })
+                    ->where('o.id_unidad', $idUnidad)
+                    ->where('o.consec_orden', '>', 0)
+                    ->whereBetween('o.id_orden', [$rangeComp->min_orden, $rangeComp->max_orden])
+                    ->whereIn('p.id_tamanno', $idsPizzaTamanos)
+                    ->where('c.id_receta', $idReceta)
+                    ->groupBy('p.id_tamanno')
+                    ->select('p.id_tamanno', DB::raw('SUM(p.cantidad_producto) as cantidad'))
+                    ->pluck('cantidad', 'p.id_tamanno');
+            }
+
+            $filas       = [];
+            $totalPrev   = 0.0;
+            $totalActual = 0.0;
+
+            foreach ($catalogoPizzaTamanos as $idTamanno => $nombreTamanno) {
+                $prev   = (float) ($cantComp[$idTamanno]   ?? 0);
+                $actual = (float) ($cantActual[$idTamanno] ?? 0);
+                if ($prev <= 0 && $actual <= 0) {
+                    continue;
+                }
+
+                $var = $actual - $prev;
+                $pct = $prev > 0 ? round(($var / $prev) * 100, 1) : null;
+
+                $totalPrev   += $prev;
+                $totalActual += $actual;
+
+                $filas[] = [
+                    'id_tamanno' => $idTamanno,
+                    'nombre'     => $nombreTamanno,
+                    'fx_prev'    => round($prev, 1),
+                    'fx_actual'  => round($actual, 1),
+                    'pct_ap'     => $pct,
+                    'variacion'  => round($var, 1),
+                ];
+            }
+
+            $varTotal = $totalActual - $totalPrev;
+            $pctTotal = $totalPrev > 0 ? round(($varTotal / $totalPrev) * 100, 1) : null;
+            $slug     = strtolower((string) preg_replace('/[^a-z0-9]+/i', '-', $nombreReceta));
+
+            $orillas[] = [
+                'id_receta'    => $idReceta,
+                'nombre'       => $nombreReceta,
+                'slug'         => $slug,
+                'filas'        => $filas,
+                'total_prev'   => round($totalPrev, 1),
+                'total_actual' => round($totalActual, 1),
+                'total_pct_ap' => $pctTotal,
+                'total_var'    => round($varTotal, 1),
+                'sin_ventas'   => empty($filas),
+            ];
+        }
+
+        return response()->json([
+            'id_unidad'         => $idUnidad,
+            'nombre_unidad'     => $nombreUnidad,
+            'fecha_inicio'      => $fechaInicioStr,
+            'fecha_fin'         => $fechaFinStr,
+            'fecha_comp_inicio' => $fechaCompInicio->format('Y-m-d'),
+            'fecha_comp_fin'    => $fechaCompFin->format('Y-m-d'),
+            'year_actual'       => $fechaFin->year,
+            'year_anterior'     => $fechaCompFin->year,
+            'orillas'           => $orillas,
+        ]);
+    }
 }

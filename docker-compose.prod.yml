@@ -38,7 +38,7 @@ services:
     restart: unless-stopped
 
   mysql:
-    image: mysql:8.0
+    image: mysql:9.7
     ports:
       - "${MYSQL_PORT:-3310}:3306"
     environment:

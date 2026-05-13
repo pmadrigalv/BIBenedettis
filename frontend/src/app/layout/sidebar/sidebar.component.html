@@ -215,6 +215,28 @@
             <svg class="h-4 w-4 flex-shrink-0 opacity-70" viewBox="0 0 24 24" fill="currentColor"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5c-1.11 0-1.99.9-1.99 2L3 19c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
             RPT RANGO
           </a>
+          <a
+            class="nav-item flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm cursor-pointer select-none"
+            [class.submenu-active]="currentSection === 'kpis-rpt-unidad'"
+            [class.text-amber-200]="currentSection !== 'kpis-rpt-unidad'"
+            [class.hover:bg-white/8]="currentSection !== 'kpis-rpt-unidad'"
+            href="#"
+            (click)="onOpenKpiRptUnidad($event)"
+          >
+            <svg class="h-4 w-4 flex-shrink-0 opacity-70" viewBox="0 0 24 24" fill="currentColor"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 14l-5-5 1.41-1.41L12 14.17l7.59-7.59L21 8l-9 9z"/></svg>
+            REP. VENTAS
+          </a>
+          <a
+            class="nav-item flex items-center gap-2.5 rounded-lg px-3 py-2 text-sm cursor-pointer select-none"
+            [class.submenu-active]="currentSection === 'kpis-rpt-orillas'"
+            [class.text-amber-200]="currentSection !== 'kpis-rpt-orillas'"
+            [class.hover:bg-white/8]="currentSection !== 'kpis-rpt-orillas'"
+            href="#"
+            (click)="onOpenKpiRptOrillas($event)"
+          >
+            <svg class="h-4 w-4 flex-shrink-0 opacity-70" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/></svg>
+            ORILLAS
+          </a>
         </div>
       }
 

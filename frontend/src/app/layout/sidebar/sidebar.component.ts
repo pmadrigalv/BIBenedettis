@@ -8,7 +8,9 @@ export type LayoutSection =
   | 'tickets'
   | 'actualizaciones'
   | 'kpis-rpt-dia'
-  | 'kpis-rpt-rango';
+  | 'kpis-rpt-rango'
+  | 'kpis-rpt-unidad'
+  | 'kpis-rpt-orillas';
 export type BackendStatus = 'loading' | 'online' | 'offline';
 
 @Component({
@@ -39,6 +41,8 @@ export class SidebarComponent {
   @Output() openActualizaciones = new EventEmitter<void>();
   @Output() openKpiRptDia = new EventEmitter<void>();
   @Output() openKpiRptRango = new EventEmitter<void>();
+  @Output() openKpiRptUnidad = new EventEmitter<void>();
+  @Output() openKpiRptOrillas = new EventEmitter<void>();
   @Output() logout = new EventEmitter<void>();
   @Output() close = new EventEmitter<void>();
 
@@ -95,6 +99,16 @@ export class SidebarComponent {
   protected onOpenKpiRptRango(event: Event): void {
     event.preventDefault();
     this.openKpiRptRango.emit();
+  }
+
+  protected onOpenKpiRptUnidad(event: Event): void {
+    event.preventDefault();
+    this.openKpiRptUnidad.emit();
+  }
+
+  protected onOpenKpiRptOrillas(event: Event): void {
+    event.preventDefault();
+    this.openKpiRptOrillas.emit();
   }
 
   protected onLogout(): void {
