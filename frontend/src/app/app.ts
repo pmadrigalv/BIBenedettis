@@ -41,7 +41,10 @@ export class App {
   protected readonly loginSubmitting = signal(false);
   protected readonly loginUid = signal('');
   protected readonly loginPwd = signal('');
-  protected readonly sidebarOpen = signal(false);
+  protected readonly sidebarOpen = signal(
+    typeof window !== 'undefined' && window.innerWidth >= 1024
+  );
+  protected readonly sidebarCollapsed = signal(false);
   protected readonly adminMenuOpen = signal(false);
   protected readonly sistemasMenuOpen = signal(false);
   protected readonly kpisMenuOpen = signal(false);
@@ -119,7 +122,14 @@ export class App {
   }
 
   protected closeSidebar(): void {
-    this.sidebarOpen.set(false);
+    // Only close the sidebar overlay on mobile; on desktop it stays open
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      this.sidebarOpen.set(false);
+    }
+  }
+
+  protected toggleSidebarCollapse(): void {
+    this.sidebarCollapsed.update((value) => !value);
   }
 
   protected reload(): void {

@@ -1,65 +1,103 @@
-<main class="min-h-screen bg-[#f5f6f8] text-slate-800">
+<main class="min-h-screen bg-[#f0f4f8] text-slate-800">
   @if (sessionLoading()) {
-    <div class="grid min-h-screen place-items-center">
-      <p class="text-sm text-slate-500">Verificando sesión...</p>
+    <div class="grid min-h-screen place-items-center"
+         style="background: linear-gradient(135deg,#071810 0%,#0a2a18 50%,#0c3420 100%)">
+      <div class="flex flex-col items-center gap-4">
+        <div class="h-10 w-10 rounded-xl border-2 border-white/60 animate-pulse"
+             style="background: linear-gradient(135deg,#0f9b58 0%,#0f9b58 46%,#ffffff 46%,#ffffff 54%,#d73535 54%,#d73535 100%)">
+        </div>
+        <p class="text-sm text-emerald-300/70 tracking-widest uppercase">Verificando sesión…</p>
+      </div>
     </div>
   } @else if (!isAuthenticated()) {
-    <div class="grid min-h-screen place-items-center px-4">
-      <section class="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-7 shadow-sm">
-        <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Iniciar sesión</h1>
-        <p class="mt-1 text-sm text-slate-500">Accede con tu usuario del sistema para continuar.</p>
+    <!-- ── Login Page ── -->
+    <div class="relative grid min-h-screen place-items-center overflow-hidden px-4"
+         style="background: linear-gradient(135deg,#071810 0%,#0a2a18 40%,#0c3420 70%,#071810 100%)">
 
-        <div class="mt-5 space-y-4">
+      <!-- Background decorative circles -->
+      <div class="pointer-events-none absolute inset-0 overflow-hidden">
+        <div class="absolute -top-32 -left-32 h-96 w-96 rounded-full opacity-10"
+             style="background: radial-gradient(circle, #10b981 0%, transparent 70%)"></div>
+        <div class="absolute -bottom-32 -right-32 h-96 w-96 rounded-full opacity-10"
+             style="background: radial-gradient(circle, #34d399 0%, transparent 70%)"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 h-[600px] w-[600px] rounded-full opacity-5"
+             style="background: radial-gradient(circle, #6ee7b7 0%, transparent 60%)"></div>
+      </div>
+
+      <section
+        class="relative w-full max-w-sm rounded-2xl p-8 shadow-2xl"
+        style="background: rgba(255,255,255,0.04); backdrop-filter: blur(20px); border: 1px solid rgba(52,211,153,0.2); box-shadow: 0 25px 50px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);"
+      >
+        <!-- Logo + Brand -->
+        <div class="mb-8 flex flex-col items-center gap-3">
+          <div class="h-14 w-14 rounded-2xl border-2 border-white/60 shadow-lg"
+               style="background: linear-gradient(135deg,#0f9b58 0%,#0f9b58 46%,#ffffff 46%,#ffffff 54%,#d73535 54%,#d73535 100%); box-shadow: 0 0 20px rgba(16,185,129,0.3)">
+          </div>
+          <div class="text-center">
+            <p class="text-lg font-extrabold italic text-white">Benedetti's <span class="not-italic font-semibold text-amber-300 text-sm tracking-widest">PIZZA</span></p>
+            <p class="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-400/70 mt-0.5">Business Intelligence</p>
+          </div>
+        </div>
+
+        <h2 class="text-xl font-bold tracking-tight text-white mb-1">Iniciar sesión</h2>
+        <p class="text-sm text-emerald-300/60 mb-6">Accede con tu usuario del sistema.</p>
+
+        <div class="space-y-4">
           <div>
-            <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500">Usuario</label>
+            <label class="block text-xs font-semibold uppercase tracking-widest text-emerald-400/70 mb-1.5">Usuario</label>
             <input
               [value]="loginUid()"
               (input)="onLoginUidInput($event)"
               type="text"
               autocomplete="username"
-              class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-slate-300"
+              class="w-full rounded-xl px-4 py-2.5 text-sm text-white outline-none transition-all duration-200 placeholder-white/20"
+              style="background: rgba(255,255,255,0.06); border: 1px solid rgba(52,211,153,0.2);"
+              placeholder="tu_usuario"
+              onfocus="this.style.borderColor='rgba(52,211,153,0.6)'; this.style.boxShadow='0 0 0 3px rgba(52,211,153,0.1)'"
+              onblur="this.style.borderColor='rgba(52,211,153,0.2)'; this.style.boxShadow='none'"
             />
           </div>
           <div>
-            <label class="block text-xs font-semibold uppercase tracking-wide text-slate-500">Contraseña</label>
+            <label class="block text-xs font-semibold uppercase tracking-widest text-emerald-400/70 mb-1.5">Contraseña</label>
             <input
               [value]="loginPwd()"
               (input)="onLoginPwdInput($event)"
               (keyup.enter)="login()"
               type="password"
               autocomplete="current-password"
-              class="mt-1 w-full rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-slate-300"
+              class="w-full rounded-xl px-4 py-2.5 text-sm text-white outline-none transition-all duration-200 placeholder-white/20"
+              style="background: rgba(255,255,255,0.06); border: 1px solid rgba(52,211,153,0.2);"
+              placeholder="••••••••"
+              onfocus="this.style.borderColor='rgba(52,211,153,0.6)'; this.style.boxShadow='0 0 0 3px rgba(52,211,153,0.1)'"
+              onblur="this.style.borderColor='rgba(52,211,153,0.2)'; this.style.boxShadow='none'"
             />
           </div>
         </div>
 
         @if (loginError()) {
-          <p class="mt-4 rounded-lg border border-rose-100 bg-rose-50 px-3 py-2 text-xs text-rose-700">{{ loginError() }}</p>
+          <div class="mt-4 flex items-start gap-2 rounded-xl border border-rose-400/30 bg-rose-500/10 px-3.5 py-2.5 text-xs text-rose-300">
+            <svg class="h-4 w-4 flex-shrink-0 mt-0.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+            {{ loginError() }}
+          </div>
         }
 
         <button
           type="button"
           (click)="login()"
           [disabled]="loginSubmitting()"
-          class="mt-6 w-full rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-700 disabled:opacity-50"
+          class="mt-6 w-full rounded-xl py-2.5 text-sm font-bold text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-[1.02] active:scale-[0.98]"
+          style="background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%); box-shadow: 0 4px 15px rgba(16,185,129,0.35);"
         >
-          {{ loginSubmitting() ? 'Ingresando...' : 'Entrar' }}
+          {{ loginSubmitting() ? 'Ingresando…' : 'Entrar al sistema' }}
         </button>
       </section>
     </div>
   } @else {
-    <div class="mx-auto flex min-h-screen w-full max-w-[1500px]">
-      @if (sidebarOpen()) {
-        <button
-          type="button"
-          (click)="closeSidebar()"
-          class="fixed inset-0 z-30 bg-black/45 lg:bg-black/35"
-          aria-label="Cerrar menu lateral"
-        ></button>
-      }
-
+    <div class="flex h-screen w-full overflow-hidden">
+      <!-- Sidebar always visible on desktop, togglable on mobile -->
       <app-sidebar
         [isOpen]="sidebarOpen()"
+        [isCollapsed]="sidebarCollapsed()"
         [currentSection]="currentSection()"
         [adminMenuOpen]="adminMenuOpen()"
         [sistemasMenuOpen]="sistemasMenuOpen()"
@@ -67,6 +105,7 @@
         [status]="status()"
         [authUserUid]="authUser()?.uid_usuario || ''"
         (close)="closeSidebar()"
+        (toggleCollapse)="toggleSidebarCollapse()"
         (toggleAdminMenu)="toggleAdminMenu()"
         (toggleSistemasMenu)="toggleSistemasMenu()"
         (toggleKpisMenu)="toggleKpisMenu()"
@@ -83,10 +122,9 @@
         (logout)="logout()"
       />
 
-      <section class="flex min-w-0 flex-1 flex-col">
+      <div class="flex h-screen flex-1 flex-col min-w-0">
         <app-navbar (toggleSidebar)="toggleSidebar()" />
-
-        <div class="flex-1 space-y-6 px-4 py-6 sm:px-7 lg:px-8">
+        <main class="flex-1 overflow-y-auto p-4 bg-[#f5f6f8]">
           @if (currentSection() === 'unidades') {
             <app-admin-unidades />
           } @else if (currentSection() === 'usuarios') {
@@ -104,114 +142,173 @@
           ) {
             <app-admin-kpis [reportType]="currentKpiReport()" />
           } @else {
-          <div>
-            <h1 class="text-2xl font-semibold tracking-tight text-slate-900">Dashboard</h1>
-            <p class="mt-1 text-sm text-slate-500">Base layout para Angular con estilo profesional y bloques listos para crecer.</p>
+          <!-- ── Dashboard ─────────────────────────────────────────── -->
+          <div class="mb-6">
+            <h1 class="text-xl font-bold tracking-tight text-slate-800">Dashboard</h1>
+            <p class="mt-0.5 text-sm text-slate-500">Resumen ejecutivo · Benedetti's BI</p>
           </div>
 
-          <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-              <p class="text-xs font-medium uppercase tracking-[0.14em] text-slate-400">Total Revenue</p>
-              <p class="mt-3 text-3xl font-semibold text-slate-900">$48,295</p>
-              <p class="mt-2 text-xs font-medium text-emerald-600">+12.5% vs last month</p>
+          <!-- KPI Cards -->
+          <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4 mb-6">
+            <article class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
+              <div class="absolute top-0 left-0 h-1 w-full" style="background: linear-gradient(90deg,#10b981,#34d399)"></div>
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Ventas Totales</p>
+                  <p class="mt-2.5 text-3xl font-bold text-slate-900">$48,295</p>
+                  <p class="mt-1.5 flex items-center gap-1 text-xs font-semibold text-emerald-600">
+                    <svg class="h-3 w-3" viewBox="0 0 24 24" fill="currentColor"><path d="M7 14l5-5 5 5H7z"/></svg>
+                    +12.5% vs mes anterior
+                  </p>
+                </div>
+                <div class="rounded-xl p-2.5" style="background: rgba(16,185,129,0.1)">
+                  <svg class="h-6 w-6 text-emerald-500" viewBox="0 0 24 24" fill="currentColor"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+                </div>
+              </div>
             </article>
 
-            <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-              <p class="text-xs font-medium uppercase tracking-[0.14em] text-slate-400">Active Users</p>
-              <p class="mt-3 text-3xl font-semibold text-slate-900">2,847</p>
-              <p class="mt-2 text-xs font-medium text-emerald-600">+8.2% vs last month</p>
+            <article class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
+              <div class="absolute top-0 left-0 h-1 w-full" style="background: linear-gradient(90deg,#3b82f6,#60a5fa)"></div>
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Usuarios Activos</p>
+                  <p class="mt-2.5 text-3xl font-bold text-slate-900">2,847</p>
+                  <p class="mt-1.5 flex items-center gap-1 text-xs font-semibold text-blue-600">
+                    <svg class="h-3 w-3" viewBox="0 0 24 24" fill="currentColor"><path d="M7 14l5-5 5 5H7z"/></svg>
+                    +8.2% vs mes anterior
+                  </p>
+                </div>
+                <div class="rounded-xl p-2.5" style="background: rgba(59,130,246,0.1)">
+                  <svg class="h-6 w-6 text-blue-500" viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                </div>
+              </div>
             </article>
 
-            <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-              <p class="text-xs font-medium uppercase tracking-[0.14em] text-slate-400">Total Orders</p>
-              <p class="mt-3 text-3xl font-semibold text-slate-900">1,432</p>
-              <p class="mt-2 text-xs font-medium text-rose-600">-3.1% vs last month</p>
+            <article class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
+              <div class="absolute top-0 left-0 h-1 w-full" style="background: linear-gradient(90deg,#f59e0b,#fbbf24)"></div>
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Órdenes Totales</p>
+                  <p class="mt-2.5 text-3xl font-bold text-slate-900">1,432</p>
+                  <p class="mt-1.5 flex items-center gap-1 text-xs font-semibold text-rose-500">
+                    <svg class="h-3 w-3 rotate-180" viewBox="0 0 24 24" fill="currentColor"><path d="M7 14l5-5 5 5H7z"/></svg>
+                    -3.1% vs mes anterior
+                  </p>
+                </div>
+                <div class="rounded-xl p-2.5" style="background: rgba(245,158,11,0.1)">
+                  <svg class="h-6 w-6 text-amber-500" viewBox="0 0 24 24" fill="currentColor"><path d="M20 12c0-1.1.9-2 2-2V6c0-1.1-.9-2-2-2H4c-1.1 0-1.99.9-1.99 2v4c1.1 0 1.99.9 1.99 2s-.89 2-2 2v4c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2v-4c-1.1 0-2-.9-2-2zm-2-1.46V18H6V6h12v4.54z"/></svg>
+                </div>
+              </div>
             </article>
 
-            <article class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-              <p class="text-xs font-medium uppercase tracking-[0.14em] text-slate-400">Page Views</p>
-              <p class="mt-3 text-3xl font-semibold text-slate-900">284k</p>
-              <p class="mt-2 text-xs font-medium text-emerald-600">+24.7% vs last month</p>
+            <article class="group relative overflow-hidden rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-0.5">
+              <div class="absolute top-0 left-0 h-1 w-full" style="background: linear-gradient(90deg,#8b5cf6,#a78bfa)"></div>
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="text-xs font-semibold uppercase tracking-[0.14em] text-slate-400">Vistas de Página</p>
+                  <p class="mt-2.5 text-3xl font-bold text-slate-900">284k</p>
+                  <p class="mt-1.5 flex items-center gap-1 text-xs font-semibold text-violet-600">
+                    <svg class="h-3 w-3" viewBox="0 0 24 24" fill="currentColor"><path d="M7 14l5-5 5 5H7z"/></svg>
+                    +24.7% vs mes anterior
+                  </p>
+                </div>
+                <div class="rounded-xl p-2.5" style="background: rgba(139,92,246,0.1)">
+                  <svg class="h-6 w-6 text-violet-500" viewBox="0 0 24 24" fill="currentColor"><path d="M3 13h2v8H3zm4-8h2v16H7zm4-2h2v18h-2zm4 4h2v14h-2zm4-1h2v15h-2z"/></svg>
+                </div>
+              </div>
             </article>
           </section>
 
+          <!-- Chart + Health -->
           <section class="grid gap-4 xl:grid-cols-[1.7fr_1fr]">
             <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
               <div class="mb-5 flex items-center justify-between gap-3">
                 <div>
-                  <p class="text-sm font-semibold text-slate-900">Overview</p>
-                  <p class="text-xs text-slate-500">Monthly performance trend for current year</p>
+                  <p class="text-sm font-bold text-slate-900">Tendencia de Ventas</p>
+                  <p class="text-xs text-slate-400">Rendimiento mensual del año actual</p>
                 </div>
-                <div class="inline-flex rounded-lg bg-slate-100 p-1 text-xs font-medium text-slate-500">
-                  <button class="rounded-md bg-white px-3 py-1.5 text-slate-800 shadow-sm">Revenue</button>
-                  <button class="px-3 py-1.5">Orders</button>
-                  <button class="px-3 py-1.5">Profit</button>
+                <div class="inline-flex rounded-lg border border-slate-200 bg-slate-50 p-0.5 text-xs font-medium text-slate-500">
+                  <button class="rounded-md bg-white px-3 py-1.5 text-slate-800 shadow-sm font-semibold">Revenue</button>
+                  <button class="px-3 py-1.5 hover:text-slate-700 transition-colors">Órdenes</button>
+                  <button class="px-3 py-1.5 hover:text-slate-700 transition-colors">Margen</button>
                 </div>
               </div>
-
-              <div class="relative h-64 overflow-hidden rounded-xl border border-slate-200 bg-gradient-to-b from-orange-50 to-white">
-                <div class="absolute inset-x-0 bottom-0 h-44 bg-gradient-to-t from-orange-200/35 to-transparent"></div>
-                <svg viewBox="0 0 500 220" class="absolute inset-0 h-full w-full">
-                  <polyline fill="none" stroke="#f97316" stroke-width="4" points="0,175 55,165 105,168 160,140 210,135 265,120 325,112 385,104 440,95 500,80" />
+              <div class="relative h-52 overflow-hidden rounded-xl border border-emerald-100 bg-gradient-to-b from-emerald-50/60 to-white">
+                <div class="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-emerald-100/40 to-transparent"></div>
+                <svg viewBox="0 0 500 200" class="absolute inset-0 h-full w-full" preserveAspectRatio="none">
+                  <defs>
+                    <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
+                      <stop offset="0%" stop-color="#059669"/>
+                      <stop offset="100%" stop-color="#34d399"/>
+                    </linearGradient>
+                  </defs>
+                  <polyline fill="none" stroke="url(#lineGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"
+                    points="0,165 55,150 105,155 160,128 210,120 265,105 325,96 385,88 440,75 500,60" />
+                  <circle cx="500" cy="60" r="5" fill="#34d399"/>
                 </svg>
               </div>
             </article>
 
             <div class="grid gap-4">
               <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <p class="text-sm font-semibold text-slate-900">Traffic Sources</p>
+                <p class="text-sm font-bold text-slate-900">Distribución de Tráfico</p>
                 <div class="mt-4 flex items-center gap-5">
-                  <div class="grid h-24 w-24 place-items-center rounded-full border-[10px] border-teal-500 border-t-orange-400 border-r-slate-300 border-b-emerald-500 text-sm font-semibold text-slate-700">284K</div>
+                  <div class="grid h-24 w-24 flex-shrink-0 place-items-center rounded-full border-[10px] border-teal-400 border-t-amber-400 border-r-slate-200 border-b-emerald-500 text-sm font-bold text-slate-700">284K</div>
                   <div class="space-y-2 text-xs text-slate-500">
-                    <p class="flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-orange-400"></span>Direct 35%</p>
-                    <p class="flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-emerald-500"></span>Organic 28%</p>
-                    <p class="flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-slate-300"></span>Referral 22%</p>
-                    <p class="flex items-center gap-2"><span class="h-2 w-2 rounded-full bg-teal-500"></span>Social 15%</p>
+                    <p class="flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-amber-400 flex-shrink-0"></span>Directo 35%</p>
+                    <p class="flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-emerald-500 flex-shrink-0"></span>Orgánico 28%</p>
+                    <p class="flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-slate-300 flex-shrink-0"></span>Referral 22%</p>
+                    <p class="flex items-center gap-2"><span class="h-2.5 w-2.5 rounded-full bg-teal-400 flex-shrink-0"></span>Social 15%</p>
                   </div>
                 </div>
               </article>
 
               <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <p class="text-sm font-semibold text-slate-900">Backend Health</p>
+                <p class="text-sm font-bold text-slate-900">Estado del Backend</p>
                 @if (health(); as api) {
-                  <dl class="mt-4 space-y-3 text-sm">
+                  <dl class="mt-4 space-y-2.5 text-sm">
                     <div class="flex items-center justify-between">
-                      <dt class="text-slate-500">Laravel</dt>
-                      <dd class="font-medium text-slate-700">{{ api.laravel }}</dd>
+                      <dt class="text-slate-400 font-medium">Laravel</dt>
+                      <dd class="font-semibold text-slate-700 text-xs bg-slate-100 px-2 py-0.5 rounded-full">{{ api.laravel }}</dd>
                     </div>
                     <div class="flex items-center justify-between">
-                      <dt class="text-slate-500">PHP</dt>
-                      <dd class="font-medium text-slate-700">{{ api.php }}</dd>
+                      <dt class="text-slate-400 font-medium">PHP</dt>
+                      <dd class="font-semibold text-slate-700 text-xs bg-slate-100 px-2 py-0.5 rounded-full">{{ api.php }}</dd>
                     </div>
                     <div class="flex items-center justify-between">
-                      <dt class="text-slate-500">DB</dt>
-                      <dd class="font-medium" [class.text-emerald-600]="api.database.status === 'ok'" [class.text-rose-600]="api.database.status !== 'ok'">
-                        {{ api.database.connection }} / {{ api.database.status }}
+                      <dt class="text-slate-400 font-medium">Base de datos</dt>
+                      <dd class="font-semibold text-xs px-2 py-0.5 rounded-full"
+                          [class.bg-emerald-100]="api.database.status === 'ok'"
+                          [class.text-emerald-700]="api.database.status === 'ok'"
+                          [class.bg-rose-100]="api.database.status !== 'ok'"
+                          [class.text-rose-700]="api.database.status !== 'ok'">
+                        {{ api.database.connection }} · {{ api.database.status }}
                       </dd>
                     </div>
-                    <div class="rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-500">
-                      Last sync: {{ api.timestamp }}
+                    <div class="rounded-lg bg-slate-50 border border-slate-100 px-3 py-2 text-xs text-slate-400">
+                      Última sync: {{ api.timestamp }}
                     </div>
                   </dl>
                 } @else {
-                  <p class="mt-4 rounded-lg border border-rose-100 bg-rose-50 px-3 py-2 text-xs text-rose-700">
-                    {{ errorMessage() || 'Esperando respuesta del backend...' }}
+                  <p class="mt-4 flex items-center gap-2 rounded-lg border border-rose-100 bg-rose-50 px-3 py-2 text-xs text-rose-600">
+                    <svg class="h-4 w-4 flex-shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                    {{ errorMessage() || 'Esperando respuesta del backend…' }}
                   </p>
                 }
 
                 <button
                   type="button"
                   (click)="reload()"
-                  class="mt-5 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100"
+                  class="mt-4 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-600 transition-all duration-150 hover:bg-slate-100 hover:border-slate-300 active:scale-[0.98]"
                 >
-                  Reintentar conexion
+                  Reintentar conexión
                 </button>
               </article>
             </div>
           </section>
           }
-        </div>
-      </section>
+        </main>
+      </div>
     </div>
   }
 </main>

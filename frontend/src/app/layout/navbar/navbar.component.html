@@ -1,18 +1,49 @@
-<header class="sticky top-0 z-20 border-b-4 border-[#3fd17f] bg-[#0b7f3f] px-4 py-4 shadow-lg sm:px-7">
+<header
+  class="sticky top-0 z-20 px-4 py-3 sm:px-6 shadow-lg"
+  style="background: linear-gradient(135deg, #071810 0%, #0a2a18 50%, #0c3420 100%); border-bottom: 1px solid rgba(52,211,153,0.18);"
+>
   <div class="flex items-center justify-between gap-3">
+
+    <!-- Left: hamburger + brand -->
     <div class="flex items-center gap-3">
       <button
         type="button"
         (click)="onToggleSidebar()"
-        class="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-white/40 bg-white/10 text-white hover:bg-white/20"
+        class="group inline-flex h-9 w-9 items-center justify-center rounded-lg border border-white/20 bg-white/8 text-emerald-300 transition-all duration-200 hover:bg-emerald-400/20 hover:text-white hover:border-emerald-400/50 hover:scale-105 active:scale-95"
         aria-label="Abrir menu"
       >
-        <svg viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5" aria-hidden="true">
+        <svg viewBox="0 0 20 20" fill="currentColor" class="h-5 w-5 transition-transform duration-200" aria-hidden="true">
           <path fill-rule="evenodd" d="M3 5.75A.75.75 0 013.75 5h12.5a.75.75 0 010 1.5H3.75A.75.75 0 013 5.75zm0 4.25a.75.75 0 01.75-.75h12.5a.75.75 0 010 1.5H3.75A.75.75 0 013 10zm0 4.25a.75.75 0 01.75-.75h12.5a.75.75 0 010 1.5H3.75a.75.75 0 01-.75-.75z" clip-rule="evenodd" />
         </svg>
       </button>
-      <h1 class="text-xl font-bold tracking-tight text-white sm:text-2xl">Business Intelligence</h1>
+
+      <!-- Brand text (desktop) -->
+      <div class="hidden sm:flex items-center gap-2">
+        <div class="h-1.5 w-1.5 rounded-full bg-emerald-400" style="box-shadow: 0 0 6px #34d399;"></div>
+        <h1 class="text-base font-bold tracking-tight text-white sm:text-lg">
+          Business <span class="text-emerald-300">Intelligence</span>
+        </h1>
+      </div>
     </div>
-    <span class="rounded-xl border border-white/45 bg-white/8 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-100">Dashboard</span>
+
+    <!-- Right: pill badge -->
+    <div class="flex items-center gap-3">
+      <span
+        class="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/30 bg-emerald-400/10 px-3 py-1 text-xs font-semibold tracking-widest uppercase text-emerald-300"
+        style="letter-spacing: 0.14em;"
+      >
+        <svg class="h-3 w-3" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M3 13h2v8H3zm4-8h2v16H7zm4-2h2v18h-2zm4 4h2v14h-2zm4-1h2v15h-2z"/>
+        </svg>
+        Dashboard
+      </span>
+    </div>
+
   </div>
+
+  <!-- Bottom highlight line with gradient glow -->
+  <div
+    class="absolute inset-x-0 bottom-0 h-px"
+    style="background: linear-gradient(90deg, transparent 0%, rgba(52,211,153,0.5) 30%, rgba(52,211,153,0.7) 50%, rgba(52,211,153,0.5) 70%, transparent 100%);"
+  ></div>
 </header>

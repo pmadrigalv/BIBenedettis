@@ -56,6 +56,42 @@ export type CrearUnidadPayload = {
   ip_unidad: string | null;
 };
 
+export type ActualizarUnidadPayload = CrearUnidadPayload;
+
+export type UnidadDetail = {
+  id_unidad: number;
+  nombre_unidad: string;
+  id_estado: number | null;
+  ciudad: string | null;
+  ip_unidad: string | null;
+  id_zona: number | null;
+  id_region: number | null;
+  uactip_unidad: string | null;
+  fapertura_unidad: string | null;
+  telefono_unidad: string | null;
+  id_tipounidad: number | null;
+  status_unidad: number;
+  alcancepedido_unidad: number | null;
+  clave_unidad: string | null;
+};
+
+export type UnidadUsuarioRelacion = {
+  id_usuario: number;
+  uid_usuario: string;
+  nombre: string;
+  autoridad: string | null;
+};
+
+export type AltaUsuarioTiendaResponse = {
+  message: string;
+  data: {
+    host: string;
+    database: string;
+    tabla: string;
+    id_usuario: number;
+  };
+};
+
 @Injectable({ providedIn: 'root' })
 export class UnidadesApiService {
   private readonly http = inject(HttpClient);
@@ -90,5 +126,29 @@ export class UnidadesApiService {
 
   create(payload: CrearUnidadPayload) {
     return this.http.post('/api/unidades', payload);
+  }
+
+  detail(unidadId: number) {
+    return this.http.get<UnidadDetail>(`/api/unidades/${unidadId}`);
+  }
+
+  update(unidadId: number, payload: ActualizarUnidadPayload) {
+    return this.http.put(`/api/unidades/${unidadId}`, payload);
+  }
+
+  usuarios(unidadId: number) {
+    return this.http.get<UnidadUsuarioRelacion[]>(`/api/unidades/${unidadId}/usuarios`);
+  }
+
+  addUsuario(unidadId: number, usuarioId: number) {
+    return this.http.post(`/api/unidades/${unidadId}/usuarios`, { id_usuario: usuarioId });
+  }
+
+  removeUsuario(unidadId: number, usuarioId: number) {
+    return this.http.delete(`/api/unidades/${unidadId}/usuarios/${usuarioId}`);
+  }
+
+  altaUsuarioTienda(unidadId: number, usuarioId: number) {
+    return this.http.post<AltaUsuarioTiendaResponse>(`/api/unidades/${unidadId}/usuarios/${usuarioId}/alta-tienda`, {});
   }
 }

@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 export type LayoutSection =
   | 'dashboard'
@@ -16,10 +17,13 @@ export type BackendStatus = 'loading' | 'online' | 'offline';
 @Component({
   selector: 'app-sidebar',
   standalone: true,
+  imports: [CommonModule],
   templateUrl: './sidebar.component.html',
+  styleUrl: './sidebar.component.scss',
 })
 export class SidebarComponent {
   @Input() isOpen = false;
+  @Input() isCollapsed = false;
   @Input() currentSection: LayoutSection = 'dashboard';
   @Input() adminMenuOpen = false;
   @Input() sistemasMenuOpen = false;
@@ -27,6 +31,7 @@ export class SidebarComponent {
   @Input() status: BackendStatus = 'loading';
   @Input() authUserUid = '';
 
+  @Output() toggleCollapse = new EventEmitter<void>();
   @Output() toggleAdminMenu = new EventEmitter<void>();
   @Output() toggleSistemasMenu = new EventEmitter<void>();
   @Output() toggleKpisMenu = new EventEmitter<void>();
@@ -45,6 +50,10 @@ export class SidebarComponent {
 
   protected onClose(): void {
     this.close.emit();
+  }
+
+  protected onToggleCollapse(): void {
+    this.toggleCollapse.emit();
   }
 
   protected onToggleAdminMenu(): void {

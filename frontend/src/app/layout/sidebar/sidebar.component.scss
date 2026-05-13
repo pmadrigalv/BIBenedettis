@@ -1,0 +1,126 @@
+
+:host {
+  display: contents;
+}
+
+/* ── Sidebar root ───────────────────────────────────────────────── */
+aside {
+  height: 100vh;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(175deg, #071810 0%, #0a2a18 45%, #0c3420 75%, #071a10 100%);
+  border-right: 1px solid rgba(52, 211, 153, 0.12);
+  transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (min-width: 1024px) {
+  aside {
+    position: static !important;
+    height: 100vh !important;
+    /* Do NOT force transform: none — let isOpen control visibility via width */
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.3);
+  }
+
+  /* Fully hide the sidebar in the flex layout without transform */
+  aside.desktop-hidden {
+    width: 0 !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    border: none !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
+}
+
+/* ── Active nav item ────────────────────────────────────────────── */
+.nav-active {
+  background: linear-gradient(135deg, rgba(52, 211, 153, 0.18) 0%, rgba(16, 185, 129, 0.10) 100%);
+  border-left: 3px solid #34d399;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06),
+              0 1px 8px rgba(52, 211, 153, 0.15);
+  color: #6ee7b7 !important;
+}
+
+/* ── Nav item hover translate ───────────────────────────────────── */
+.nav-item {
+  transition: transform 0.15s ease, background 0.2s ease, box-shadow 0.2s ease;
+  &:hover:not(.nav-active) {
+    transform: translateX(3px);
+  }
+}
+
+/* ── Submenu slide-down ─────────────────────────────────────────── */
+@keyframes submenu-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.submenu-items {
+  animation: submenu-slide-in 0.22s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* ── Submenu active item ────────────────────────────────────────── */
+.submenu-active {
+  background: rgba(52, 211, 153, 0.2);
+  border-left: 2px solid #6ee7b7;
+  color: #a7f3d0 !important;
+  font-weight: 600;
+}
+
+/* ── Status dot pulse ───────────────────────────────────────────── */
+@keyframes status-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 currentColor; opacity: 1; }
+  50%       { box-shadow: 0 0 6px 2px currentColor; opacity: 0.75; }
+}
+
+.status-dot {
+  animation: status-pulse 2.4s ease-in-out infinite;
+}
+
+/* ── Tooltip fade-in ────────────────────────────────────────────── */
+@keyframes tooltip-fade {
+  from { opacity: 0; transform: translateX(-4px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.tooltip-popup {
+  animation: tooltip-fade 0.14s ease forwards;
+  pointer-events: none;
+}
+
+/* ── Logo glow shimmer ──────────────────────────────────────────── */
+@keyframes logo-glow {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(52, 211, 153, 0.3)); }
+  50%       { filter: drop-shadow(0 0 10px rgba(52, 211, 153, 0.6)); }
+}
+
+.logo-badge {
+  animation: logo-glow 3.5s ease-in-out infinite;
+}
+
+/* ── Section divider gradient line ─────────────────────────────── */
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(52, 211, 153, 0.25) 40%, rgba(52, 211, 153, 0.25) 60%, transparent 100%);
+  border: none;
+  margin: 0.75rem 0;
+}
+
+/* ── Collapse button spin ───────────────────────────────────────── */
+.collapse-btn svg {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Mobile overlay backdrop ────────────────────────────────────── */
+@keyframes overlay-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
